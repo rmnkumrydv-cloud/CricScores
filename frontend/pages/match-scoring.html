@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umpire Mode - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .scoreboard-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .main-board {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #00E676;
+            margin: 10px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: #252525;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border-bottom: 3px solid #00E676;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .field-players {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .player-card {
+            background: #222;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            text-align: left;
+            position: relative;
+        }
+
+        .player-card.active {
+            border-color: #00E676;
+            background: rgba(0, 230, 118, 0.05);
+        }
+
+        .player-card.active::after {
+            content: '*';
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: #00E676;
+            font-size: 1.5em;
+        }
+
+        .player-role {
+            font-size: 0.7em;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .player-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .scoring-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .control-btn {
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: 800;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: #333;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-boundary {
+            background: #059669;
+        }
+
+        .btn-six {
+            background: #2563eb;
+        }
+
+        .btn-extra {
+            background: #d97706;
+        }
+
+        .btn-wicket {
+            background: #dc2626;
+            grid-column: span 4;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid #333;
+        }
+
+        .modal-content h2 {
+            color: #00E676;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            font-size: 1em;
+        }
+
+        .last-ball {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(0, 230, 118, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+            border-left: 4px solid #00E676;
+            text-align: left;
+        }
+
+        .btn-setup {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background: #00E676;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
+            <div id="matchHeader" style="font-weight: bold; color: #aaa;">Loading Match Details...</div>
+            <div id="winProbBox"
+                style="background: #252525; padding: 10px 20px; border-radius: 30px; border: 1px solid #333;">
+                Win Prob: <span id="winProb" style="color: #00E676; font-weight: 800;">50%</span>
+            </div>
+        </header>
+
+        <div class="scoreboard-container">
+            <div class="main-board">
+                <h2 id="battingTeam" style="text-transform: uppercase; letter-spacing: 2px;">Team</h2>
+                <div class="score-display">
+                    <span id="score">0</span>/<span id="wickets">0</span>
+                </div>
+                <div style="color: #888; font-weight: bold;">
+                    Overs: <span id="overs" style="color: #fff; font-size: 1.2em;">0.0</span>
+                </div>
+
+                <div class="field-players">
+                    <div class="player-card active" id="strikerCard">
+                        <span class="player-role">Striker</span>
+                        <span class="player-name" id="strikerName">Select...</span>
+                    </div>
+                    <div class="player-card" id="nonStrikerCard">
+                        <span class="player-role">Non-Striker</span>
+                        <span class="player-name" id="nonStrikerName">Select...</span>
+                    </div>
+                    <div class="player-card" id="bowlerCard" style="grid-column: span 2;">
+                        <span class="player-role">Bowler</span>
+                        <span class="player-name" id="bowlerName">Select...</span>
+                    </div>
+                </div>
+
+                <div class="last-ball" id="lastBallInfo">
+                    Last Ball: <span id="lastBallDetail" style="font-weight: 800; color: #00E676;">-</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">CRR</div>
+                    <div class="stat-value" id="crr">0.00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" id="projLabel">Proj. Score</div>
+                    <div class="stat-value" id="projScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Target</div>
+                    <div class="stat-value" id="target">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">RRR</div>
+                    <div class="stat-value" id="rrr">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scoring-controls">
+            <button class="control-btn" id="btn0" onclick="handleBall(0)">0</button>
+            <button class="control-btn" id="btn1" onclick="handleBall(1)">1</button>
+            <button class="control-btn" id="btn2" onclick="handleBall(2)">2</button>
+            <button class="control-btn" id="btn3" onclick="handleBall(3)">3</button>
+            <button class="control-btn btn-boundary" id="btn4" onclick="handleBall(4)">4</button>
+            <button class="control-btn btn-six" id="btn6" onclick="handleBall(6)">6</button>
+            <button class="control-btn btn-extra" onclick="handleExtra('Wide')">WD</button>
+            <button class="control-btn btn-extra" onclick="handleExtra('NoBall')">NB</button>
+            <button class="control-btn btn-extra" onclick="handleExtra('Bye')">BYE</button>
+            <button class="control-btn btn-extra" onclick="handleExtra('LegBye')">LEG-B</button>
+            <button class="control-btn btn-wicket" onclick="openWicketModal()">WICKET</button>
+        </div>
+    </div>
+
+    <!-- Selection Modal -->
+    <div id="selectionModal" class="modal">
+        <div class="modal-content">
+            <h2 id="selectionTitle">Select Players</h2>
+            <div id="selectionForm">
+                <!-- Dynamic content -->
+            </div>
+            <div style="margin-top:20px; text-align: center;">
+                <button class="btn-setup" style="width: 100%;" onclick="confirmSelection()">Confirm Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wicket Modal -->
+    <div id="wicketModal" class="modal">
+        <div class="modal-content">
+            <h2>Wicket Out!</h2>
+            <div class="form-group">
+                <label>Who got out?</label>
+                <select id="outBatsmanSelect" class="form-control">
+                    <option value="striker">Striker</option>
+                    <option value="nonStriker">Non-Striker</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Dismissal Type</label>
+                <select id="dismissalType" class="form-control" onchange="toggleDismissalFields()">
+                    <option value="Bowled">Bowled</option>
+                    <option value="Caught">Caught</option>
+                    <option value="LBW">LBW</option>
+                    <option value="Run Out">Run Out</option>
+                    <option value="Stumped">Stumped</option>
+                    <option value="Hit Wicket">Hit Wicket</option>
+                </select>
+            </div>
+            <div class="form-group" id="fielderGroup" style="display:none;">
+                <label id="fielderLabel">Fielder</label>
+                <select id="fielderSelect" class="form-control"></select>
+            </div>
+            <div style="display:flex; gap: 10px; margin-top:20px;">
+                <button class="btn-setup" style="flex:1;" onclick="submitWicket()">Record Wicket</button>
+                <button class="btn-setup" style="flex:1; background:#333; color:#fff;"
+                    onclick="closeWicketModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/scoring.js"></script>
+    <script>
+        // Check if user is logged in
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

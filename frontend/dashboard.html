@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CricScores</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">CricScores</div>
+        <div class="nav-links">
+            <span id="userName" style="margin-right: 20px; font-weight: bold;"></span>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <h2 style="border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; display: inline-block;">My
+            Dashboard</h2>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>My Teams</h3>
+                <p>Manage your cricket teams and players.</p>
+                <a href="pages/teams.html" class="btn btn-primary"
+                    style="margin-top: 15px; display: inline-block;">Manage Teams</a>
+            </div>
+            <div class="card">
+                <h3>My Tournaments</h3>
+                <p>Host and manage tournaments, fixtures, and points table.</p>
+                <a href="pages/tournaments.html" class="btn btn-primary"
+                    style="margin-top: 15px; display: inline-block;">Manage Tournaments</a>
+            </div>
+            <div class="card">
+                <h3>Start a Match</h3>
+                <p>Quick start a new match and score live.</p>
+                <a href="pages/match-setup.html" class="btn btn-primary"
+                    style="margin-top: 15px; display: inline-block;">New Match</a>
+            </div>
+            <div class="card">
+                <h3>Player Stats</h3>
+                <p>View top performers across the platform.</p>
+                <a href="pages/leaderboards.html" class="btn btn-primary"
+                    style="margin-top: 15px; display: inline-block;">Leaderboards</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px;">
+            <h3 style="margin-bottom: 20px; color: #888;">Recent Matches</h3>
+            <div id="recentMatchesList" class="dashboard-grid">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!user) {
+            window.location.href = 'pages/login.html';
+        } else {
+            document.getElementById('userName').textContent = `Welcome, ${user.name}`;
+            loadRecentMatches();
+        }
+
+        async function loadRecentMatches() {
+            const list = document.getElementById('recentMatchesList');
+            try {
+                const matches = await fetchAPI('/matches?limit=4');
+                list.innerHTML = '';
+
+                if (matches.length === 0) {
+                    list.innerHTML = '<p style="color: #555;">No recent matches found.</p>';
+                    return;
+                }
+
+                matches.forEach(match => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.borderLeft = match.status === 'Live' ? '4px solid #4ade80' : '1px solid #333';
+
+                    let statusHtml = `<span style="font-size: 0.8em; padding: 2px 6px; border-radius: 4px; background: ${match.status === 'Live' ? '#4ade80' : '#444'}; color: #000;">${match.status}</span>`;
+
+                    const t1Name = match.innings[0].battingTeam.name || "Team 1";
+                    const t2Name = match.innings[1].battingTeam.name || "Team 2";
+
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <h4 style="margin: 0;">${t1Name} vs ${t2Name}</h4>
+                            ${statusHtml}
+                        </div>
+                        <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">${new Date(match.date).toLocaleDateString()} @ ${match.venue || 'TBD'}</p>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="pages/match-scoring.html?id=${match._id}" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.85em;">${match.status === 'Completed' ? 'View' : 'Score'}</a>
+                            ${match.status === 'Completed' ? `<a href="pages/match-result.html?id=${match._id}" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.85em;">Result</a>` : ''}
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = '<p style="color: var(--error-color);">Error loading matches.</p>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Result - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .result-container {
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .winner-banner {
+            font-size: 3em;
+            color: #4ade80;
+            margin: 20px 0;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .pom-section {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #FFD700;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .pom-name {
+            font-size: 1.5em;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .match-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: #252525;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .summary-score {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .summary-team {
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .btn-home {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: #4ade80;
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="result-container" style="max-width: 1000px;">
+        <h1>Match Result</h1>
+        <div class="winner-banner" id="winnerName">TEAM A WINS!</div>
+        <p id="resultDetail" style="font-size: 1.4em; color: #aaa; margin-bottom: 20px;">Won by 4 wickets</p>
+
+        <div id="pomSection" class="pom-section">
+            <div style="font-size: 0.9em; color: #888; text-transform: uppercase;">Player of the Match</div>
+            <div id="pomName" class="pom-name">Loading...</div>
+        </div>
+
+        <div id="pomSelectContainer" style="display: none; margin-bottom: 30px;">
+            <button onclick="openPOMModal()" class="btn btn-secondary"
+                style="border: 1px solid #FFD700; color: #FFD700;">Nominate Player of the Match</button>
+        </div>
+
+        <div id="scorecards">
+            <!-- Dynamic Scorecards -->
+        </div>
+
+        <!-- POM Modal -->
+        <div id="pomModal" class="modal"
+            style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);">
+            <div class="modal-content"
+                style="background: #1a1a1a; margin: 10% auto; padding: 30px; border-radius: 12px; max-width: 500px; border: 1px solid #333;">
+                <h3>Select Player of the Match</h3>
+                <div class="form-group" style="margin: 20px 0;">
+                    <select id="pomPlayerSelect" class="form-control"
+                        style="width: 100%; padding: 10px; background: #222; color: #fff; border: 1px solid #444; border-radius: 6px;">
+                        <option value="">Select a Player</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="submitPOM()" class="btn btn-primary">Submit</button>
+                    <button onclick="closePOMModal()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px;">
+            <a href="../index.html" class="btn-home">Return to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="match-summary">
+        <div class="summary-card">
+            <div class="summary-team" id="team1Name">Team 1</div>
+            <div class="summary-score" id="team1Score">0/0</div>
+            <div id="team1Overs">0.0 overs</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-team" id="team2Name">Team 2</div>
+            <div class="summary-score" id="team2Score">0/0</div>
+            <div id="team2Overs">0.0 overs</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px;">
+        <a href="../index.html" class="btn-home">Back to Home</a>
+    </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('id');
+
+        async function loadResult() {
+            try {
+                const match = await fetchAPI(`/matches/${matchId}`);
+                window.currentMatch = match; // Store globally for POM modal
+
+                // Display Winner
+                if (match.winner) {
+                    const winner = match.winner.name || 'Unknown Team';
+                    document.getElementById('winnerName').textContent = `${winner} WINS!`;
+                    document.getElementById('resultDetail').textContent = match.result || '';
+                } else {
+                    document.getElementById('winnerName').textContent = "MATCH DRAWN/TIED";
+                }
+
+                // Display POM
+                const pomSection = document.getElementById('pomSection');
+                const pomSelectContainer = document.getElementById('pomSelectContainer');
+
+                if (match.playerOfTheMatch) {
+                    pomSection.style.display = 'block';
+                    document.getElementById('pomName').textContent = match.playerOfTheMatch.name || 'Player';
+                    pomSelectContainer.style.display = 'none';
+                } else {
+                    pomSection.style.display = 'none';
+                    // Show selection button if user is creator
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    if (user && match.createdBy === user.id) {
+                        pomSelectContainer.style.display = 'block';
+                    }
+                }
+
+                const scorecardsContainer = document.getElementById('scorecards');
+                scorecardsContainer.innerHTML = '';
+
+                match.innings.forEach((inn, idx) => {
+                    const innDiv = document.createElement('div');
+                    innDiv.className = 'innings-section';
+                    innDiv.style.marginBottom = '40px';
+                    innDiv.innerHTML = `
+                        <h2 style="text-align: left; color: #00E676; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                            ${inn.battingTeam.name} - ${inn.runs}/${inn.wickets} (${inn.overs})
+                        </h2>
+                        <h4 style="text-align: left; color: #aaa; margin: 10px 0;">Batting</h4>
+                        <table class="scorecard-table" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <thead>
+                                <tr style="background: #333; color: #aaa; text-align: left;">
+                                    <th style="padding: 10px;">Batter</th>
+                                    <th>R</th>
+                                    <th>B</th>
+                                    <th>4s</th>
+                                    <th>6s</th>
+                                    <th>SR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batting-${idx}"></tbody>
+                        </table>
+                        <h4 style="text-align: left; color: #aaa; margin: 10px 0;">Bowling</h4>
+                        <table class="scorecard-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #333; color: #aaa; text-align: left;">
+                                    <th style="padding: 10px;">Bowler</th>
+                                    <th>O</th>
+                                    <th>M</th>
+                                    <th>R</th>
+                                    <th>W</th>
+                                    <th>Econ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bowling-${idx}"></tbody>
+                        </table>
+                    `;
+                    scorecardsContainer.appendChild(innDiv);
+                    renderStats(inn, idx);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderStats(innings, idx) {
+            const batBody = document.getElementById(`batting-${idx}`);
+            const battingStats = innings.battingStats || [];
+
+            battingStats.forEach(b => {
+                const playerName = b.player.name || "Unknown";
+                const sr = b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(2) : '0.00';
+                const status = b.isOut ? (b.dismissalType === 'Bowled' ? 'b ' + b.bowler.name : b.dismissalType + ' (' + (b.fielder ? b.fielder.name : '') + ') b ' + b.bowler.name) : 'not out';
+
+                batBody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #222; text-align: left;">
+                        <td style="padding: 10px;">
+                            <strong>${playerName}</strong><br>
+                            <small style="color: #888;">${status}</small>
+                        </td>
+                        <td>${b.runs}</td>
+                        <td>${b.balls}</td>
+                        <td>${b.fours}</td>
+                        <td>${b.sixes}</td>
+                        <td>${sr}</td>
+                    </tr>
+                `;
+            });
+
+            const bowlBody = document.getElementById(`bowling-${idx}`);
+            const bowlingStats = innings.bowlingStats || [];
+
+            bowlingStats.forEach(bl => {
+                const playerName = bl.player.name || "Unknown";
+                const econ = bl.overs > 0 ? (bl.runsConceded / (Math.floor(bl.overs) + (bl.overs % 1) * 10 / 6)).toFixed(2) : '0.00';
+
+                bowlBody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #222; text-align: left;">
+                        <td style="padding: 10px;">${playerName}</td>
+                        <td>${bl.overs.toFixed(1)}</td>
+                        <td>${bl.maidens}</td>
+                        <td>${bl.runsConceded}</td>
+                        <td>${bl.wickets}</td>
+                        <td>${econ}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function openPOMModal() {
+            if (!window.currentMatch) return;
+            const select = document.getElementById('pomPlayerSelect');
+            select.innerHTML = '<option value="">Select a Player</option>';
+
+            const m = window.currentMatch;
+            const allPlayers = [...m.playingXI1, ...m.playingXI2];
+
+            allPlayers.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p._id || p;
+                opt.textContent = p.name || 'Player';
+                select.appendChild(opt);
+            });
+
+            document.getElementById('pomModal').style.display = 'block';
+        }
+
+        function closePOMModal() {
+            document.getElementById('pomModal').style.display = 'none';
+        }
+
+        async function submitPOM() {
+            const playerId = document.getElementById('pomPlayerSelect').value;
+            if (!playerId) return alert('Please select a player');
+
+            try {
+                await fetchAPI(`/matches/${matchId}/pom`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ playerId })
+                });
+                closePOMModal();
+                loadResult(); // Refresh
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+        loadResult();
+    </script>
+</body>
+
+</html>

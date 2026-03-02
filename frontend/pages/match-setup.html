@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Setup - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .setup-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .team-section {
+            background: #252525;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .player-list {
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            background: #111;
+            border-radius: 4px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #222;
+        }
+
+        .player-item:last-child {
+            border-bottom: none;
+        }
+
+        .counter {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .counter.valid {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .btn-setup {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            background: #4ade80;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-setup:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .header-setup {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-setup h1 {
+            color: #4ade80;
+            margin-bottom: 5px;
+        }
+
+        .header-setup p {
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="setup-container">
+        <div class="header-setup">
+            <h1>CricScores Setup</h1>
+            <p>Select Tournament, Teams, and exactly 11 players for each.</p>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <label style="color: #aaa; display: block; margin-bottom: 5px;">Tournament (Optional)</label>
+            <select id="tournamentSelect" class="form-control" style="width: 100%;">
+                <option value="">Friendly Match (No Tournament)</option>
+            </select>
+        </div>
+
+        <div class="teams-grid">
+            <!-- Team 1 -->
+            <div class="team-section">
+                <h3>Team A</h3>
+                <select id="team1Select" class="form-control" style="width: 100%; margin-bottom: 10px;">
+                    <option value="">Select Team</option>
+                </select>
+                <div id="team1Players" class="player-list">
+                    <p style="text-align: center; color: #555; margin-top: 20px;">Select a team first</p>
+                </div>
+                <div id="team1Counter" class="counter">Players selected: 0/11</div>
+            </div>
+
+            <!-- Team 2 -->
+            <div class="team-section">
+                <h3>Team B</h3>
+                <select id="team2Select" class="form-control" style="width: 100%; margin-bottom: 10px;">
+                    <option value="">Select Team</option>
+                </select>
+                <div id="team2Players" class="player-list">
+                    <p style="text-align: center; color: #555; margin-top: 20px;">Select a team first</p>
+                </div>
+                <div id="team2Counter" class="counter">Players selected: 0/11</div>
+            </div>
+        </div>
+
+        <button id="startSetupBtn" class="btn-setup" disabled>Proceed to Toss</button>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/match-setup.js"></script>
+    <script>
+        // Check if user is logged in
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

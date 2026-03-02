@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboards - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .leaderboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .leaderboard-card {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .leaderboard-table th {
+            text-align: left;
+            color: #888;
+            padding: 10px;
+            border-bottom: 2px solid #333;
+        }
+
+        .leaderboard-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .rank {
+            font-weight: 800;
+            color: #00E676;
+            width: 30px;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: bold;
+        }
+
+        .player-team {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .stat-highlight {
+            font-weight: bold;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header
+            style="padding: 30px 0; border-bottom: 1px solid #333; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="color: #00E676;">Player Leaderboards</h1>
+            <a href="../dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+        </header>
+
+        <div class="leaderboard-grid">
+            <div class="leaderboard-card">
+                <h3 style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5em;">🏏</span> Top Batsmen
+                </h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Runs</th>
+                            <th>Balls</th>
+                            <th>Avg.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="battingLeaderboard">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #555; padding: 40px;">Loading stats...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="leaderboard-card">
+                <h3 style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5em;">🎳</span> Top Bowlers
+                </h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Wkts</th>
+                            <th>Runs</th>
+                            <th>Econ.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bowlingLeaderboard">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #555; padding: 40px;">Loading stats...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        async function loadLeaderboards() {
+            try {
+                const [batters, bowlers] = await Promise.all([
+                    fetchAPI('/leaderboard/batting'),
+                    fetchAPI('/leaderboard/bowling')
+                ]);
+
+                renderBatters(batters);
+                renderBowlers(bowlers);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderBatters(data) {
+            const body = document.getElementById('battingLeaderboard');
+            body.innerHTML = '';
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No data yet</td></tr>';
+                return;
+            }
+            data.forEach((item, index) => {
+                const avg = item.balls > 0 ? (item.totalRuns / (item.balls / 6)).toFixed(1) : '0.0'; // Actually Strike Rate or something else, let's just show Runs
+                body.innerHTML += `
+                    <tr>
+                        <td class="rank">${index + 1}</td>
+                        <td>
+                            <div class="player-info">
+                                <span class="player-name">${item.playerInfo.name}</span>
+                            </div>
+                        </td>
+                        <td class="stat-highlight">${item.totalRuns}</td>
+                        <td>${item.balls}</td>
+                        <td>${(item.totalRuns / Math.max(1, item.matches.length)).toFixed(1)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderBowlers(data) {
+            const body = document.getElementById('bowlingLeaderboard');
+            body.innerHTML = '';
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No data yet</td></tr>';
+                return;
+            }
+            data.forEach((item, index) => {
+                const econ = item.totalRunsConceded > 0 ? (item.totalRunsConceded / Math.max(1, item.matches.length)).toFixed(1) : '0.0'; // Naive econ
+                body.innerHTML += `
+                    <tr>
+                        <td class="rank">${index + 1}</td>
+                        <td>
+                            <div class="player-info">
+                                <span class="player-name">${item.playerInfo.name}</span>
+                            </div>
+                        </td>
+                        <td class="stat-highlight">${item.totalWickets}</td>
+                        <td>${item.totalRunsConceded}</td>
+                        <td>${econ}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        loadLeaderboards();
+    </script>
+</body>
+
+</html>
