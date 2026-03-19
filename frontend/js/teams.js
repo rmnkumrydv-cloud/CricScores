@@ -51,7 +51,7 @@ async function loadTeams() {
 
         teams.forEach(team => {
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card glass';
             card.innerHTML = `
                 <h3>${team.name}</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 10px;">${team.city || 'No Location'}</p>

@@ -63,20 +63,19 @@ async function loadTeamDetails() {
         if (team.players && team.players.length > 0) {
             team.players.forEach(player => {
                 const item = document.createElement('div');
-                item.style.background = 'var(--background-card)';
-                item.style.padding = '15px';
-                item.style.borderRadius = '5px';
+                item.className = 'player-card glass';
+                item.style.marginBottom = '10px';
                 item.style.display = 'flex';
                 item.style.justifyContent = 'space-between';
                 item.style.alignItems = 'center';
 
                 item.innerHTML = `
                     <div>
-                        <h4 style="margin-bottom: 5px;">${player.name}</h4>
-                        <span style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; color: #ccc;">${player.role}</span>
+                        <h4 style="margin-bottom: 5px; font-weight: 700;">${player.name}</h4>
+                        <span style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">${player.role}</span>
                     </div>
-                    <div style="text-align: right; font-size: 0.9em; color: #888;">
-                        <div>${player.battingStyle}</div>
+                    <div style="text-align: right; font-size: 0.85rem; color: var(--text-secondary);">
+                        <div style="font-weight: 600; color: var(--text-primary);">${player.battingStyle}</div>
                         <div>${player.bowlingStyle}</div>
                     </div>
                 `;

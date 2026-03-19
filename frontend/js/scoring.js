@@ -71,15 +71,17 @@ function updateUI() {
     crrEl.textContent = crr.toFixed(2);
 
     if (currentInningsIdx === 0) {
-        projScoreEl.textContent = Math.round(crr * 20);
+        projScoreEl.textContent = Math.round(crr * (match.totalOvers || 20));
         targetEl.textContent = '-';
         rrrEl.textContent = '-';
     } else {
-        const target = match.innings[0].runs + 1;
+        const target = (match.innings[0].runs || 0) + 1;
         targetEl.textContent = target;
         const runsLeft = target - inningsData.runs;
-        const ballsLeft = 120 - totalBalls;
-        rrrEl.textContent = ballsLeft > 0 ? ((runsLeft / ballsLeft) * 6).toFixed(2) : '0.00';
+        const totalLegalBalls = getLegalBalls(inningsData);
+        const totalBallsLimit = (match.totalOvers || 20) * 6;
+        const ballsRemaining = totalBallsLimit - totalLegalBalls;
+        rrrEl.textContent = ballsRemaining > 0 ? ((runsLeft / ballsRemaining) * 6).toFixed(2) : '0.00';
     }
 
     updateWinProbability();
@@ -98,45 +100,115 @@ function getLegalBalls(innings) {
     return balls;
 }
 
+function updateWinProbability() {
+    if (!winProbEl) return;
+
+    if (currentInningsIdx === 0) {
+        winProbEl.textContent = '50% - 50%';
+        return;
+    }
+
+    const target = match.innings[0].runs + 1;
+    const runsLeft = target - inningsData.runs;
+    const totalBalls = (match.totalOvers || 20) * 6;
+    const ballsLeft = totalBalls - getLegalBalls(inningsData);
+    const wicketsLeft = 10 - inningsData.wickets;
+
+    if (runsLeft <= 0) {
+        winProbEl.textContent = 'Batting Team Won';
+        return;
+    }
+    if (ballsLeft <= 0 || wicketsLeft <= 0) {
+        winProbEl.textContent = 'Bowling Team Won';
+        return;
+    }
+
+    // Simple probability algorithm
+    const rrr = (runsLeft / ballsLeft) * 6;
+    let battingWinProb = 100 - (rrr * 10) + (wicketsLeft * 5);
+    battingWinProb = Math.max(5, Math.min(95, battingWinProb));
+
+    const bowlingWinProb = 100 - battingWinProb;
+    winProbEl.textContent = `${battingWinProb.toFixed(0)}% - ${bowlingWinProb.toFixed(0)}%`;
+}
+
 function updatePlayerDisplays() {
-    const players = inningsData.battingTeam.players;
-    const bowlingPlayers = inningsData.bowlingTeam.players;
+    const players = inningsData.battingTeam.players || [];
+    const bowlingPlayers = inningsData.bowlingTeam.players || [];
 
-    const striker = players.find(p => p._id === strikerId);
-    const nonStriker = players.find(p => p._id === nonStrikerId);
-    const bowler = bowlingPlayers.find(p => p._id === bowlerId);
+    // Fallback search in playingXI if not in players list
+    const findSelectedPlayer = (id, list, playingXI) => {
+        if (!id) return null;
+        // Search in list first (populated or ID list)
+        let p = list.find(x => (x._id || x).toString() === id.toString());
+        // If not found or not populated, search in playingXI (which should be populated on match)
+        if ((!p || !p.name) && playingXI) {
+            p = playingXI.find(x => (x._id || x).toString() === id.toString());
+        }
+        return p;
+    };
 
-    strikerNameEl.textContent = striker ? striker.name : 'Select...';
-    nonStrikerNameEl.textContent = nonStriker ? nonStriker.name : 'Select...';
-    bowlerNameEl.textContent = bowler ? bowler.name : 'Select...';
+    const striker = findSelectedPlayer(strikerId, players, currentInningsIdx === 0 ? match.playingXI1 : match.playingXI2);
+    const nonStriker = findSelectedPlayer(nonStrikerId, players, currentInningsIdx === 0 ? match.playingXI1 : match.playingXI2);
+    const bowler = findSelectedPlayer(bowlerId, bowlingPlayers, currentInningsIdx === 0 ? match.playingXI2 : match.playingXI1);
+
+    strikerNameEl.textContent = (striker && striker.name) ? striker.name : (strikerId ? strikerId.substring(0, 8) + '...' : 'Select...');
+    nonStrikerNameEl.textContent = (nonStriker && nonStriker.name) ? nonStriker.name : (nonStrikerId ? nonStrikerId.substring(0, 8) + '...' : 'Select...');
+    bowlerNameEl.textContent = (bowler && bowler.name) ? bowler.name : (bowlerId ? bowlerId.substring(0, 8) + '...' : 'Select...');
 
     // Highlight striker
     strikerCard.classList.add('active');
     nonStrikerCard.classList.remove('active');
 }
 
-function updateWinProbability() {
-    if (currentInningsIdx === 0) {
-        winProbEl.textContent = "50%";
-        return;
+async function rotateStrike() {
+    [strikerId, nonStrikerId] = [nonStrikerId, strikerId];
+    try {
+        await fetchAPI(`/matches/${matchId}/players`, {
+            method: 'PUT',
+            body: JSON.stringify({ strikerId, nonStrikerId, bowlerId })
+        });
+        updateUI();
+    } catch (error) {
+        console.error("Strike rotation failed", error);
     }
-    const target = match.innings[0].runs + 1;
-    const runsLeft = target - inningsData.runs;
-    const ballsLeft = 120 - getLegalBalls(inningsData);
-    const wicketsLeft = 10 - inningsData.wickets;
+}
 
-    let prob = 50 + (wicketsLeft * 5) - (runsLeft / Math.max(1, ballsLeft)) * 10;
-    prob = Math.max(5, Math.min(95, prob));
-    winProbEl.textContent = Math.round(prob) + "%";
+function checkAndPromptPlayers() {
+    if (!strikerId || !nonStrikerId) promptNewInningsPlayers();
+    else if (!bowlerId) promptNewBowler();
+}
+
+function promptNewInningsPlayers() {
+    const players = currentInningsIdx === 0 ? match.playingXI1 : match.playingXI2;
+    const bowlingPlayers = currentInningsIdx === 0 ? match.playingXI2 : match.playingXI1;
+
+    // This is for opening pair, we might still want dropdowns or multi-step tiles
+    // Let's use simplified tiles for one at a time for better UX
+    promptNewBatsman('striker', 'Select Striker');
+}
+
+function promptNewBowler() {
+    const bowlingPlayers = (currentInningsIdx === 0 ? match.playingXI2 : match.playingXI1);
+
+    showSelectionModal('Select Bowler', [
+        { label: 'Choose a bowler', id: 'bowlerSelect', options: bowlingPlayers, current: bowlerId }
+    ], async (data) => {
+        bowlerId = data.bowlerSelect;
+
+        try {
+            await fetchAPI(`/matches/${matchId}/players`, {
+                method: 'PUT',
+                body: JSON.stringify({ strikerId, nonStrikerId, bowlerId })
+            });
+            updateUI();
+        } catch (error) {
+            alert("Failed to save bowler: " + error.message);
+        }
+    });
 }
 
 async function handleBall(runs, isExtra = false, extraType = null, wicketDetail = null) {
-    if (!strikerId || !nonStrikerId || !bowlerId) {
-        alert("Please select striker, non-striker and bowler first!");
-        checkAndPromptPlayers();
-        return;
-    }
-
     try {
         const ballData = {
             runs,
@@ -157,27 +229,39 @@ async function handleBall(runs, isExtra = false, extraType = null, wicketDetail 
         match = updatedMatch;
         inningsData = match.innings[currentInningsIdx];
 
-        lastBallDetail.textContent = ballData.event + (extraType ? ` (${extraType})` : '');
+        // Restore state from backend (important for strike rotation, etc.)
+        strikerId = match.currentStriker?._id || match.currentStriker;
+        nonStrikerId = match.currentNonStriker?._id || match.currentNonStriker;
+        bowlerId = match.currentBowler?._id || match.currentBowler;
 
-        // Strike Rotation logic
-        if (!isExtra || (extraType === 'Bye' || extraType === 'LegBye')) {
-            if (runs % 2 !== 0) rotateStrike();
+        updateUI();
+
+        if (inningsData.status === 'Completed') {
+            setTimeout(() => {
+                handleInningsEnd();
+            }, 500);
+            return;
         }
 
         updateUI();
 
         // Check for over end
-        const currentOverBalls = inningsData.oversHistory[inningsData.oversHistory.length - 1].balls.filter(b => !b.isExtra || (b.extraType !== 'Wide' && b.extraType !== 'NoBall')).length;
+        const currentOver = inningsData.oversHistory[inningsData.oversHistory.length - 1];
+        if (!currentOver) return;
+
+        const currentOverBalls = currentOver.balls.filter(b => !b.isExtra || (b.extraType !== 'Wide' && b.extraType !== 'NoBall')).length;
 
         if (currentOverBalls === 6) {
-            alert("End of Over!");
-            rotateStrike();
-            promptNewBowler();
+            setTimeout(() => {
+                alert("End of Over!");
+                rotateStrike().then(() => promptNewBowler());
+            }, 500);
         }
 
         // Check for Innings End
         const target = currentInningsIdx === 1 ? (match.innings[0].runs + 1) : Infinity;
-        if (inningsData.runs >= target || inningsData.wickets >= 10 || getLegalBalls(inningsData) >= 120) {
+        const totalBalls = (match.totalOvers || 20) * 6;
+        if (inningsData.runs >= target || inningsData.wickets >= 10 || getLegalBalls(inningsData) >= totalBalls) {
             handleInningsEnd();
         } else if (wicketDetail) {
             // Check if it's a "cross" dismissal or if non-striker got out
@@ -193,7 +277,8 @@ async function handleBall(runs, isExtra = false, extraType = null, wicketDetail 
                 strikerId = null;
             }
 
-            promptNewBatsman();
+            // Small delay to let wicket modal close before next prompt
+            setTimeout(() => promptNewBatsman(), 1000);
         }
 
     } catch (error) {
@@ -201,83 +286,61 @@ async function handleBall(runs, isExtra = false, extraType = null, wicketDetail 
     }
 }
 
-function rotateStrike() {
-    const temp = strikerId;
-    strikerId = nonStrikerId;
-    nonStrikerId = temp;
+async function undoLastBall() {
+    if (!confirm("Are you sure you want to revert the last ball?")) return;
+
+    try {
+        const updatedMatch = await fetchAPI(`/matches/${matchId}/undo`, {
+            method: 'PUT',
+            body: JSON.stringify({ inningsIndex: currentInningsIdx })
+        });
+
+        match = updatedMatch;
+        inningsData = match.innings[currentInningsIdx];
+
+        // Restore state from backend
+        strikerId = match.currentStriker?._id || match.currentStriker;
+        nonStrikerId = match.currentNonStriker?._id || match.currentNonStriker;
+        bowlerId = match.currentBowler?._id || match.currentBowler;
+
+        updateUI();
+        lastBallDetail.textContent = "- (Undone)";
+        alert("Decision Reverted!");
+    } catch (error) {
+        alert("Failed to undo: " + error.message);
+    }
 }
 
-function checkAndPromptPlayers() {
-    if (!strikerId || !nonStrikerId) promptNewInningsPlayers();
-    else if (!bowlerId) promptNewBowler();
-}
+function promptNewBatsman(position = 'striker', title = 'Select Batsman') {
+    const battingStats = inningsData.battingStats || [];
+    const outPlayerIds = battingStats.filter(s => s.isOut).map(s => (s.player._id || s.player).toString());
+    const playingXI = currentInningsIdx === 0 ? match.playingXI1 : match.playingXI2;
 
-function promptNewInningsPlayers() {
-    const players = currentInningsIdx === 0 ? match.playingXI1 : match.playingXI2;
-    const bowlingPlayers = currentInningsIdx === 0 ? match.playingXI2 : match.playingXI1;
+    // Available players: Not out AND not already at the crease in the OTHER position
+    const otherId = position === 'striker' ? nonStrikerId?.toString() : strikerId?.toString();
+    const availablePlayers = playingXI.filter(p => {
+        const pid = (p._id || p).toString();
+        return !outPlayerIds.includes(pid) && pid !== otherId;
+    });
 
-    showSelectionModal('Select Opening Pair', [
-        { label: 'Striker', id: 'strikerSelect', options: players },
-        { label: 'Non-Striker', id: 'nonStrikerSelect', options: players },
-        { label: 'Opening Bowler', id: 'bowlerSelect', options: bowlingPlayers }
+    showSelectionModal(title, [
+        { label: 'Choose a batsman', id: 'batsmanSelect', options: availablePlayers, current: (position === 'striker' ? strikerId : nonStrikerId) }
     ], async (data) => {
-        strikerId = data.strikerSelect;
-        nonStrikerId = data.nonStrikerSelect;
-        bowlerId = data.bowlerSelect;
+        const selectedId = data.batsmanSelect;
+        if (position === 'striker') strikerId = selectedId;
+        else nonStrikerId = selectedId;
 
-        // Save to backend
         try {
             await fetchAPI(`/matches/${matchId}/players`, {
                 method: 'PUT',
                 body: JSON.stringify({ strikerId, nonStrikerId, bowlerId })
             });
             updateUI();
-        } catch (error) {
-            alert("Failed to save player selection: " + error.message);
-        }
-    });
-}
 
-function promptNewBowler() {
-    const bowlingPlayers = (currentInningsIdx === 0 ? match.playingXI2 : match.playingXI1).filter(p => p._id !== bowlerId);
-    showSelectionModal('Select New Bowler', [
-        { label: 'Bowler', id: 'bowlerSelect', options: bowlingPlayers }
-    ], async (data) => {
-        bowlerId = data.bowlerSelect;
+            // If the other batsman is also not selected, prompt for it
+            if (!strikerId || !nonStrikerId) promptNewBatsman(strikerId ? 'nonStriker' : 'striker');
+            else if (!bowlerId) promptNewBowler();
 
-        try {
-            await fetchAPI(`/matches/${matchId}/players`, {
-                method: 'PUT',
-                body: JSON.stringify({ bowlerId })
-            });
-            updateUI();
-        } catch (error) {
-            alert("Failed to save bowler: " + error.message);
-        }
-    });
-}
-
-function promptNewBatsman() {
-    const battingStats = inningsData.battingStats || [];
-    const battedPlayerIds = battingStats.filter(s => s.isOut).map(s => (s.player._id || s.player).toString());
-    const playingXI = currentInningsIdx === 0 ? match.playingXI1 : match.playingXI2;
-
-    // Filter out players who are already out or currently at crease
-    const availablePlayers = playingXI.filter(p => !battedPlayerIds.includes(p._id.toString()) && p._id.toString() !== strikerId && p._id.toString() !== nonStrikerId);
-
-    showSelectionModal('New Batsman', [
-        { label: 'Next Batsman', id: 'newBatsmanSelect', options: availablePlayers }
-    ], async (data) => {
-        const newBatsmanId = data.newBatsmanSelect;
-        if (!strikerId) strikerId = newBatsmanId;
-        else nonStrikerId = newBatsmanId;
-
-        try {
-            await fetchAPI(`/matches/${matchId}/players`, {
-                method: 'PUT',
-                body: JSON.stringify({ strikerId, nonStrikerId })
-            });
-            updateUI();
         } catch (error) {
             alert("Failed to save batsman: " + error.message);
         }
@@ -285,30 +348,62 @@ function promptNewBatsman() {
 }
 
 let selectionCallback = null;
+let currentSelectionData = {};
+
 function showSelectionModal(title, fields, callback) {
     document.getElementById('selectionTitle').textContent = title;
     const form = document.getElementById('selectionForm');
-    form.innerHTML = fields.map(f => `
-        <div class="form-group">
-            <label>${f.label}</label>
-            <select id="${f.id}" class="form-control">
-                ${f.options.map(opt => `<option value="${opt._id}">${opt.name}</option>`).join('')}
-            </select>
-        </div>
-    `).join('');
+    currentSelectionData = {};
+
+    form.innerHTML = fields.map(f => {
+        return `
+            <div class="selection-field" id="field_${f.id}">
+                <label class="stat-label">${f.label}</label>
+                <div class="player-grid">
+                    ${f.options.map(opt => `
+                        <div class="player-tile ${opt._id?.toString() === f.current?.toString() || opt.toString() === f.current?.toString() ? 'selected' : ''}" 
+                             onclick="selectPlayerTile('${f.id}', '${opt._id || opt}')" 
+                             id="tile_${opt._id || opt}">
+                            <span class="tile-name">${opt.name || 'Unknown Player'}</span>
+                            <span class="tile-role">${opt.role || 'Player'}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Pre-fill current selections
+    fields.forEach(f => {
+        if (f.current) currentSelectionData[f.id] = f.current.toString();
+    });
 
     selectionCallback = callback;
     document.getElementById('selectionModal').style.display = 'flex';
 }
 
+function selectPlayerTile(fieldId, playerId) {
+    // Unselect others in the same grid
+    const grid = document.querySelector(`#field_${fieldId} .player-grid`);
+    grid.querySelectorAll('.player-tile').forEach(t => t.classList.remove('selected'));
+
+    // Select this one
+    document.getElementById(`tile_${playerId}`).classList.add('selected');
+    currentSelectionData[fieldId] = playerId;
+}
+
 function confirmSelection() {
-    const form = document.getElementById('selectionForm');
-    const selects = form.querySelectorAll('select');
-    const data = {};
-    selects.forEach(s => data[s.id] = s.value);
+    if (Object.keys(currentSelectionData).length === 0) {
+        alert("Please make a selection first!");
+        return;
+    }
 
     document.getElementById('selectionModal').style.display = 'none';
-    if (selectionCallback) selectionCallback(data);
+    if (selectionCallback) selectionCallback(currentSelectionData);
+}
+
+function closeSelectionModal() {
+    document.getElementById('selectionModal').style.display = 'none';
 }
 
 function handleExtra(type) {
@@ -324,8 +419,9 @@ function handleExtra(type) {
 }
 
 function openWicketModal() {
-    const striker = inningsData.battingTeam.players.find(p => p._id === strikerId);
-    const nonStriker = inningsData.battingTeam.players.find(p => p._id === nonStrikerId);
+    const players = inningsData.battingTeam.players;
+    const striker = players.find(p => p._id.toString() === strikerId?.toString());
+    const nonStriker = players.find(p => p._id.toString() === nonStrikerId?.toString());
 
     const outSelect = document.getElementById('outBatsmanSelect');
     outSelect.innerHTML = `
@@ -333,10 +429,23 @@ function openWicketModal() {
         <option value="${nonStrikerId}">${nonStriker ? nonStriker.name : 'Non-Striker'}</option>
     `;
 
-    // Populate fielders
-    const fielders = inningsData.bowlingTeam.players;
+    // Populate fielders from bowling team
+    const bowlingTeam = inningsData.bowlingTeam;
+    // Check if players are directly on bowlingTeam or if it's populated as an object
+    const fielders = bowlingTeam.players || [];
+
     const fielderSelect = document.getElementById('fielderSelect');
-    fielderSelect.innerHTML = fielders.map(f => `<option value="${f._id}">${f.name}</option>`).join('');
+    if (fielders.length > 0) {
+        fielderSelect.innerHTML = fielders.map(f => `<option value="${f._id}">${f.name}</option>`).join('');
+    } else {
+        // Fallback: Use playingXI if team players not populated
+        const playingXI = currentInningsIdx === 0 ? match.playingXI2 : match.playingXI1;
+        if (playingXI && playingXI.length > 0) {
+            fielderSelect.innerHTML = playingXI.map(f => `<option value="${f._id || f}">${f.name || 'Player'}</option>`).join('');
+        } else {
+            fielderSelect.innerHTML = '<option value="">No fielders found</option>';
+        }
+    }
 
     document.getElementById('wicketModal').style.display = 'flex';
 }
@@ -361,8 +470,8 @@ async function submitWicket() {
     const wicketDetail = { type, outId };
     if (['Caught', 'Run Out', 'Stumped'].includes(type)) wicketDetail.fielder = fielder;
 
-    await handleBall(0, false, null, wicketDetail);
     closeWicketModal();
+    await handleBall(0, false, null, wicketDetail);
 }
 
 function closeWicketModal() {

@@ -46,6 +46,10 @@ const matchSchema = mongoose.Schema(
         targetRuns: {
             type: Number,
         },
+        totalOvers: {
+            type: Number,
+            default: 20,
+        },
         playerOfTheMatch: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Player',
@@ -71,6 +75,10 @@ const matchSchema = mongoose.Schema(
                 bowlingTeam: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: 'Team',
+                },
+                status: {
+                    type: String, // Live, Completed
+                    default: 'Live',
                 },
                 runs: { type: Number, default: 0 },
                 wickets: { type: Number, default: 0 },
@@ -98,6 +106,7 @@ const matchSchema = mongoose.Schema(
                     {
                         player: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' },
                         overs: { type: Number, default: 0 },
+                        balls: { type: Number, default: 0 },
                         maidens: { type: Number, default: 0 },
                         runsConceded: { type: Number, default: 0 },
                         wickets: { type: Number, default: 0 }

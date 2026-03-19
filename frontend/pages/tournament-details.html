@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Details - CricScores</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -18,8 +19,8 @@
         </div>
     </nav>
 
-    <div class="container" style="margin-top: 40px;">
-        <div id="tournamentHeader" style="margin-bottom: 30px;">
+    <div class="container animate-fade" style="margin-top: 40px;">
+        <div id="tournamentHeader" class="glass" style="margin-bottom: 30px; padding: 30px; border-radius: 20px;">
             <p>Loading...</p>
         </div>
 
@@ -36,9 +37,10 @@
                 <button id="addTeamBtn" class="btn btn-primary">Add Team</button>
             </div>
 
-            <div id="addTeamFormContainer" class="form-container"
-                style="display: none; margin: 0 auto 40px auto; max-width: 600px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Add Team to Tournament</h3>
+            <div id="addTeamFormContainer" class="form-container glass"
+                style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px;">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Add Team to Tournament
+                </h3>
                 <form id="addTeamForm">
                     <div class="form-group">
                         <label for="teamSelect">Select Team</label>
@@ -66,9 +68,9 @@
                 <button id="createMatchBtn" class="btn btn-primary">Create Match</button>
             </div>
 
-            <div id="createMatchFormContainer" class="form-container"
-                style="display: none; margin: 0 auto 40px auto; max-width: 600px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Schedule Match</h3>
+            <div id="createMatchFormContainer" class="form-container glass"
+                style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px;">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Schedule Match</h3>
                 <form id="createMatchForm">
                     <div class="form-group">
                         <label for="team1Select">Team 1</label>
@@ -107,7 +109,7 @@
         <!-- Standings Tab -->
         <div id="standingsTab" style="display: none;">
             <h3 style="margin-bottom: 20px;">Points Table</h3>
-            <div class="card" style="padding: 0; overflow-x: auto;">
+            <div class="card glass" style="padding: 0; overflow-x: auto; border-radius: 20px;">
                 <table class="scorecard-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                     <thead>
                         <tr style="background: #333; color: #aaa;">

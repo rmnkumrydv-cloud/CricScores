@@ -11,11 +11,25 @@
             max-width: 600px;
             margin: 60px auto;
             text-align: center;
-            background: #1a1a1a;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-            border: 1px solid #333;
+            background: var(--background-card);
+            padding: 50px;
+            border-radius: 32px;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toss-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
         }
 
         .coin-box {
@@ -110,22 +124,24 @@
         }
 
         .btn-bat {
-            background: #00E676;
-            color: #000;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
         }
 
         .btn-bat:hover:not(:disabled) {
-            background: #00C853;
+            background: rgba(16, 185, 129, 0.2);
             transform: scale(1.05);
         }
 
         .btn-bowl {
-            background: #2979FF;
-            color: #fff;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-color);
+            border: 1px solid rgba(59, 130, 246, 0.3) !important;
         }
 
         .btn-bowl:hover:not(:disabled) {
-            background: #2962FF;
+            background: rgba(59, 130, 246, 0.2);
             transform: scale(1.05);
         }
 
@@ -145,9 +161,10 @@
         }
 
         #matchTitle {
-            font-size: 2.2em;
+            font-size: 2.8em;
+            font-weight: 800;
             margin-bottom: 10px;
-            background: linear-gradient(45deg, #eee, #888);
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;

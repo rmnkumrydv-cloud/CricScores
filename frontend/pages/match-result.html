@@ -226,9 +226,16 @@
             const battingStats = innings.battingStats || [];
 
             battingStats.forEach(b => {
-                const playerName = b.player.name || "Unknown";
+                const playerName = b.player ? b.player.name : "Unknown Batter";
                 const sr = b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(2) : '0.00';
-                const status = b.isOut ? (b.dismissalType === 'Bowled' ? 'b ' + b.bowler.name : b.dismissalType + ' (' + (b.fielder ? b.fielder.name : '') + ') b ' + b.bowler.name) : 'not out';
+
+                let status = 'not out';
+                if (b.isOut) {
+                    const bName = b.bowler ? b.bowler.name : 'Unknown';
+                    const fName = b.fielder ? b.fielder.name : '';
+                    if (b.dismissalType === 'Bowled') status = `b ${bName}`;
+                    else status = `${b.dismissalType} ${fName ? '(' + fName + ')' : ''} b ${bName}`;
+                }
 
                 batBody.innerHTML += `
                     <tr style="border-bottom: 1px solid #222; text-align: left;">
@@ -249,7 +256,7 @@
             const bowlingStats = innings.bowlingStats || [];
 
             bowlingStats.forEach(bl => {
-                const playerName = bl.player.name || "Unknown";
+                const playerName = bl.player ? bl.player.name : "Unknown Bowler";
                 const econ = bl.overs > 0 ? (bl.runsConceded / (Math.floor(bl.overs) + (bl.overs % 1) * 10 / 6)).toFixed(2) : '0.00';
 
                 bowlBody.innerHTML += `

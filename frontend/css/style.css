@@ -1,13 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
 :root {
-    --primary-color: #00E676; /* Vibrant Green */
-    --secondary-color: #2979FF; /* Bright Blue */
-    --background-dark: #121212;
-    --background-card: #1E1E1E;
-    --text-primary: #FFFFFF;
-    --text-secondary: #B0B0B0;
-    --accent-red: #FF1744;
-    --font-family: 'Inter', sans-serif;
-    --transition: all 0.3s ease;
+    --primary-color: #10b981;
+    /* Premium Emerald */
+    --secondary-color: #3b82f6;
+    /* Modern Blue */
+    --background-dark: #0f172a;
+    /* Slate Dark */
+    --background-card: rgba(30, 41, 59, 0.7);
+    /* Translucent Slate */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-red: #f43f5e;
+    --font-family: 'Outfit', sans-serif;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -81,7 +89,7 @@ ul {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .logo {
@@ -119,6 +127,7 @@ ul {
     margin-bottom: 20px;
     background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -139,7 +148,7 @@ ul {
     width: 100%;
     max-width: 400px;
     margin: 50px auto;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .form-group {
@@ -183,7 +192,7 @@ ul {
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .card h3 {
@@ -206,7 +215,69 @@ ul {
 }
 
 .message-success {
-    background-color: rgba(0, 230, 118, 0.1);
+    background-color: rgba(16, 185, 129, 0.1);
     color: var(--primary-color);
     border: 1px solid var(--primary-color);
+}
+
+/* Glassmorphism Classes */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-emerald {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.animate-fade {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.pulse-active {
+    animation: pulse-emerald 2s infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
 }

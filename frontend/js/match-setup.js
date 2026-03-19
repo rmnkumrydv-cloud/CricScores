@@ -82,6 +82,9 @@ async function loadPlayers(teamId, teamNum) {
         });
 
         updateCounter(teamNum);
+
+        // Show Select All link
+        document.getElementById(`team${teamNum}SelectAll`).style.display = 'inline';
     } catch (error) {
         console.error('Error loading players', error);
     }
@@ -112,8 +115,40 @@ function checkValidity() {
     startBtn.disabled = !(selectedPlayers1.length === 11 && selectedPlayers2.length === 11 && team1Select.value !== team2Select.value);
 }
 
+function toggleAll(teamNum) {
+    const container = teamNum === 1 ? team1PlayersEl : team2PlayersEl;
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    const link = document.getElementById(`team${teamNum}SelectAll`);
+
+    // Determine if we should select all or none
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+    checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+        const id = cb.value;
+        if (teamNum === 1) {
+            if (cb.checked) {
+                if (!selectedPlayers1.includes(id)) selectedPlayers1.push(id);
+            } else {
+                selectedPlayers1 = selectedPlayers1.filter(pid => pid !== id);
+            }
+        } else {
+            if (cb.checked) {
+                if (!selectedPlayers2.includes(id)) selectedPlayers2.push(id);
+            } else {
+                selectedPlayers2 = selectedPlayers2.filter(pid => pid !== id);
+            }
+        }
+    });
+
+    link.textContent = allChecked ? 'Select All' : 'Deselect All';
+    updateCounter(teamNum);
+    checkValidity();
+}
+
 async function handleProceed() {
     try {
+        const totalOvers = parseInt(document.getElementById('oversInput').value) || 20;
         const payload = {
             team1Id: team1Select.value,
             team2Id: team2Select.value,
@@ -121,7 +156,8 @@ async function handleProceed() {
             playingXI1: selectedPlayers1,
             playingXI2: selectedPlayers2,
             venue: 'Main Stadium',
-            date: new Date()
+            date: new Date(),
+            totalOvers
         };
 
         const match = await fetchAPI('/matches/initialize', {

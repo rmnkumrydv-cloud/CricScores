@@ -104,17 +104,29 @@
             <p>Select Tournament, Teams, and exactly 11 players for each.</p>
         </div>
 
-        <div style="margin-bottom: 30px;">
-            <label style="color: #aaa; display: block; margin-bottom: 5px;">Tournament (Optional)</label>
-            <select id="tournamentSelect" class="form-control" style="width: 100%;">
-                <option value="">Friendly Match (No Tournament)</option>
-            </select>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div>
+                <label style="color: #aaa; display: block; margin-bottom: 5px;">Tournament (Optional)</label>
+                <select id="tournamentSelect" class="form-control" style="width: 100%;">
+                    <option value="">Friendly Match (No Tournament)</option>
+                </select>
+            </div>
+            <div>
+                <label style="color: #aaa; display: block; margin-bottom: 5px;">Total Overs</label>
+                <input type="number" id="oversInput" class="form-control" value="20" min="1" max="50"
+                    style="width: 100%;">
+            </div>
         </div>
 
         <div class="teams-grid">
             <!-- Team 1 -->
             <div class="team-section">
-                <h3>Team A</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0;">Team A</h3>
+                    <a href="#" onclick="toggleAll(1); return false;" id="team1SelectAll"
+                        style="font-size: 0.85em; color: var(--primary-color); text-decoration: none; display: none;">Select
+                        All</a>
+                </div>
                 <select id="team1Select" class="form-control" style="width: 100%; margin-bottom: 10px;">
                     <option value="">Select Team</option>
                 </select>
@@ -126,7 +138,12 @@
 
             <!-- Team 2 -->
             <div class="team-section">
-                <h3>Team B</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0;">Team B</h3>
+                    <a href="#" onclick="toggleAll(2); return false;" id="team2SelectAll"
+                        style="font-size: 0.85em; color: var(--primary-color); text-decoration: none; display: none;">Select
+                        All</a>
+                </div>
                 <select id="team2Select" class="form-control" style="width: 100%; margin-bottom: 10px;">
                     <option value="">Select Team</option>
                 </select>

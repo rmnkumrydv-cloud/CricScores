@@ -155,14 +155,14 @@ function renderTeams(teamIds) {
 
     teams.forEach(team => {
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'card glass';
         // Handle cases where team might be just an ID if populate failed (though controller uses populate)
         const name = team.name || 'Unknown Team';
         const city = team.city || '';
 
         card.innerHTML = `
-            <h4>${name}</h4>
-            <p style="color: #888; font-size: 0.9em;">${city}</p>
+            <h4 style="font-weight: 700; color: var(--primary-color);">${name}</h4>
+            <p style="color: var(--text-secondary); font-size: 0.9em;">${city}</p>
         `;
         teamsList.appendChild(card);
     });
@@ -221,15 +221,15 @@ async function loadFixtures() {
         matches.forEach(match => {
             const date = new Date(match.date).toLocaleString();
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card glass';
+            card.style.marginBottom = '15px';
             card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <h4 style="margin-bottom: 5px;">${match.team1.name} vs ${match.team2.name}</h4>
-                        <p style="color: #888; font-size: 0.9em;">${date} @ ${match.venue}</p>
+                        <h4 style="margin-bottom: 5px; font-weight: 700;">${match.innings[0]?.battingTeam?.name || 'Team A'} vs ${match.innings[1]?.battingTeam?.name || 'Team B'}</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.85em;">${date} | ${match.venue}</p>
                     </div>
                     <div>
-                        <a href="match-scoring.html?id=${match._id}" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.9em;">Score</a>
+                        <a href="match-scoring.html?id=${match._id}" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.85rem; border-radius: 10px;">Score</a>
                     </div>
                 </div>
             `;
@@ -255,14 +255,14 @@ async function loadStandings() {
 
         standings.forEach(row => {
             body.innerHTML += `
-                <tr style="border-bottom: 1px solid #222;">
-                    <td style="padding: 15px; font-weight: bold;">${row.name}</td>
-                    <td>${row.played}</td>
-                    <td>${row.won}</td>
-                    <td>${row.lost}</td>
-                    <td>${row.tied}</td>
-                    <td style="color: #00E676; font-weight: bold;">${row.points}</td>
-                    <td style="color: #888;">${row.nrr}</td>
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 15px; font-weight: 700;">${row.name}</td>
+                    <td style="color: var(--text-secondary);">${row.played}</td>
+                    <td style="color: var(--text-secondary);">${row.won}</td>
+                    <td style="color: var(--text-secondary);">${row.lost}</td>
+                    <td style="color: var(--text-secondary);">${row.tied}</td>
+                    <td style="color: var(--primary-color); font-weight: 800;">${row.points}</td>
+                    <td style="color: var(--text-secondary);">${row.nrr}</td>
                 </tr>
             `;
         });

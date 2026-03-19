@@ -7,6 +7,8 @@ const {
     startMatch,
     recordBall,
     setPlayerOfTheMatch,
+    updateCurrentPlayers,
+    undoBall,
 } = require('../controllers/matchController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -19,5 +21,6 @@ router.put('/:id/start', protect, startMatch);
 router.put('/:id/players', protect, updateCurrentPlayers);
 router.post('/:id/ball', protect, recordBall);
 router.put('/:id/pom', protect, setPlayerOfTheMatch);
+router.put('/:id/undo', protect, undoBall);
 
 module.exports = router;

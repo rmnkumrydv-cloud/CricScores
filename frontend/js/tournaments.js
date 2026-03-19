@@ -52,7 +52,7 @@ async function loadTournaments() {
 
         tournaments.forEach(tourney => {
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card glass';
 
             const start = new Date(tourney.startDate).toLocaleDateString();
             const end = new Date(tourney.endDate).toLocaleDateString();
