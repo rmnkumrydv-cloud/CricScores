@@ -84,6 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('viewRole').textContent = user.playerRole || '—';
                     document.getElementById('viewBatting').textContent = user.battingStyle || '—';
                     document.getElementById('viewBowling').textContent = user.bowlingStyle || '—';
+                    document.getElementById('playerViewSpecs').style.display = 'block';
+                } else {
+                    document.getElementById('playerViewSpecs').style.display = 'none';
                 }
             }
             editForm.style.display = 'none';
@@ -114,22 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const stored = JSON.parse(localStorage.getItem('user'));
         const userRole = stored ? stored.role : 'player';
 
-        const ageVal = document.getElementById('age').value;
-        const age = ageVal ? parseInt(ageVal) : null;
-        
-        if (userRole === 'player' && (!age || age < 10)) {
-            alert('Please provide a valid age (at least 10) before verifying.');
-            return;
-        }
-
-        const name = document.getElementById('name').value;
-        if (userRole === 'umpire' && (!name || name.trim() === '')) {
+        if (!name || name.trim() === '') {
             alert('Please provide your name before verifying.');
             return;
         }
 
-        const payload = { name, isVerified: true };
-        if (age) payload.age = age;
+        const payload = { 
+            name, 
+            isVerified: true,
+            age: document.getElementById('age').value ? parseInt(document.getElementById('age').value) : null 
+        };
 
         if (base64ProfilePic) payload.profilePic = base64ProfilePic;
 
@@ -186,11 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const userRole = stored ? stored.role : 'player';
 
         // Auto-verify logic:
-        // - Players: need valid age (>= 10)
-        // - Umpires: auto-verify as long as name is filled
-        if (userRole === 'umpire' && name && name.trim().length > 0) {
-            payload.isVerified = true;
-        } else if (age && age >= 10) {
+        // - Any user: auto-verify as long as name is filled
+        if (name && name.trim().length > 0) {
             payload.isVerified = true;
         }
 
