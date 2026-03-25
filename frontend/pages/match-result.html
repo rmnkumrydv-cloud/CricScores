@@ -8,36 +8,53 @@
     <link rel="stylesheet" href="../css/style.css">
     <style>
         .result-container {
-            max-width: 800px;
-            margin: 50px auto;
+            max-width: 900px;
+            margin: 40px auto;
             text-align: center;
-            background: #1a1a1a;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            background: var(--background-card);
+            padding: 50px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
         }
 
         .winner-banner {
-            font-size: 3em;
-            color: #4ade80;
+            font-size: 3.5rem;
+            color: var(--primary-color);
             margin: 20px 0;
             font-weight: 900;
             text-transform: uppercase;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
         }
 
         .pom-section {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #FFD700;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 40px;
             display: none;
+            backdrop-filter: blur(10px);
         }
 
         .pom-name {
-            font-size: 1.5em;
+            font-size: 1.8rem;
             color: #FFD700;
-            font-weight: bold;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .match-summary {
@@ -48,93 +65,81 @@
         }
 
         .summary-card {
-            background: #252525;
-            padding: 20px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
         }
 
         .summary-score {
-            font-size: 2em;
-            font-weight: bold;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
         }
 
         .summary-team {
-            color: #888;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
             margin-bottom: 10px;
         }
 
         .btn-home {
+            display: inline-block;
             margin-top: 40px;
-            padding: 15px 30px;
-            background: #4ade80;
+            padding: 16px 40px;
+            background: var(--primary-color);
             color: #000;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
         }
     </style>
 </head>
 
-<body>
-    <div class="result-container" style="max-width: 1000px;">
-        <h1>Match Result</h1>
-        <div class="winner-banner" id="winnerName">TEAM A WINS!</div>
-        <p id="resultDetail" style="font-size: 1.4em; color: #aaa; margin-bottom: 20px;">Won by 4 wickets</p>
-
-        <div id="pomSection" class="pom-section">
-            <div style="font-size: 0.9em; color: #888; text-transform: uppercase;">Player of the Match</div>
-            <div id="pomName" class="pom-name">Loading...</div>
-        </div>
-
-        <div id="pomSelectContainer" style="display: none; margin-bottom: 30px;">
-            <button onclick="openPOMModal()" class="btn btn-secondary"
-                style="border: 1px solid #FFD700; color: #FFD700;">Nominate Player of the Match</button>
-        </div>
-
-        <div id="scorecards">
-            <!-- Dynamic Scorecards -->
-        </div>
-
-        <!-- POM Modal -->
-        <div id="pomModal" class="modal"
-            style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);">
-            <div class="modal-content"
-                style="background: #1a1a1a; margin: 10% auto; padding: 30px; border-radius: 12px; max-width: 500px; border: 1px solid #333;">
-                <h3>Select Player of the Match</h3>
-                <div class="form-group" style="margin: 20px 0;">
-                    <select id="pomPlayerSelect" class="form-control"
-                        style="width: 100%; padding: 10px; background: #222; color: #fff; border: 1px solid #444; border-radius: 6px;">
-                        <option value="">Select a Player</option>
-                    </select>
-                </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="submitPOM()" class="btn btn-primary">Submit</button>
-                    <button onclick="closePOMModal()" class="btn btn-secondary">Cancel</button>
-                </div>
+<body class="dark-mode">
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="../index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links">
+                <a href="../dashboard.html">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
             </div>
         </div>
+    </nav>
+    <div class="container animate-fade" style="margin-top: 40px;">
+        <div class="result-container">
+            <h4 style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; font-size: 0.9rem;">Match Conclusion</h4>
+            <div class="winner-banner" id="winnerName">TEAM A WINS!</div>
+            <p id="resultDetail" style="font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 30px;">Won by 4 wickets</p>
 
-        <div style="margin-top: 50px;">
-            <a href="../index.html" class="btn-home">Return to Dashboard</a>
-        </div>
-    </div>
+            <div id="pomSection" class="pom-section">
+                <div style="font-size: 0.8rem; color: #FFD700; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 5px;">🌟 Player of the Match</div>
+                <div id="pomName" class="pom-name">Loading...</div>
+            </div>
 
-    <div class="match-summary">
-        <div class="summary-card">
-            <div class="summary-team" id="team1Name">Team 1</div>
-            <div class="summary-score" id="team1Score">0/0</div>
-            <div id="team1Overs">0.0 overs</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-team" id="team2Name">Team 2</div>
-            <div class="summary-score" id="team2Score">0/0</div>
-            <div id="team2Overs">0.0 overs</div>
-        </div>
-    </div>
+            <div id="pomSelectContainer" style="display: none; margin-bottom: 30px;">
+                <button onclick="openPOMModal()" class="btn"
+                    style="border: 2px solid #FFD700; color: #FFD700; background: none; padding: 12px 30px; border-radius: 30px; font-weight: 800; cursor: pointer;">Nominate Player of the Match</button>
+            </div>
 
-    <div style="margin-top: 50px;">
-        <a href="../index.html" class="btn-home">Back to Home</a>
-    </div>
+            <div id="scorecards">
+                <!-- Dynamic Scorecards -->
+            </div>
+
+            <div style="margin-top: 50px;">
+                <a href="../dashboard.html" class="btn-home">Return to Dashboard</a>
+            </div>
+        </div>
     </div>
 
     <script src="../js/api.js"></script>

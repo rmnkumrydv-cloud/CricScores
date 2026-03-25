@@ -7,6 +7,11 @@ const userSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please add a name'],
         },
+        username: {
+            type: String,
+            required: [true, 'Please add a username'],
+            unique: true,
+        },
         email: {
             type: String,
             required: [true, 'Please add an email'],
@@ -21,6 +26,35 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
+        role: {
+            type: String,
+            enum: ['player', 'umpire'],
+            default: 'player',
+        },
+        age: {
+            type: Number,
+            default: null,
+        },
+        profilePic: {
+            type: String,
+            default: 'https://ui-avatars.com/api/?name=User&background=random',
+        },
+        isVerified: {
+            type: Boolean,
+            default: false,
+        },
+        playerRole: {
+            type: String,
+            default: 'All-rounder',
+        },
+        battingStyle: {
+            type: String,
+            default: 'Right-hand bat',
+        },
+        bowlingStyle: {
+            type: String,
+            default: 'None',
+        },
     },
     {
         timestamps: true,
@@ -33,7 +67,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
-        next();
+        return next();
     }
 
     const salt = await bcrypt.genSalt(10);

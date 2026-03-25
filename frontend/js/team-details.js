@@ -14,7 +14,39 @@ if (!teamId) {
 }
 
 // Load team details on startup
-document.addEventListener('DOMContentLoaded', loadTeamDetails);
+document.addEventListener('DOMContentLoaded', () => {
+    loadTeamDetails();
+    loadAvailablePlayers();
+});
+
+async function loadAvailablePlayers() {
+    try {
+        const players = await fetchAPI('/users/players');
+        const playerSelect = document.getElementById('playerSelect');
+        playerSelect.innerHTML = '<option value="">-- Select a Player --</option>';
+        
+        players.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p._id; // userId
+            opt.textContent = `${p.name} (@${p.username})`;
+            playerSelect.appendChild(opt);
+        });
+    } catch (error) {
+        console.error('Error loading players:', error);
+        document.getElementById('playerSelect').innerHTML = '<option value="">Error loading players</option>';
+    }
+}
+
+document.getElementById('playerSelect').addEventListener('change', (e) => {
+    const userId = e.target.value;
+    const viewStatsLink = document.getElementById('viewStatsLink');
+    if (userId) {
+        viewStatsLink.href = `player-view.html?id=${userId}`;
+        viewStatsLink.style.display = 'inline-block';
+    } else {
+        viewStatsLink.style.display = 'none';
+    }
+});
 
 addPlayerBtn.addEventListener('click', () => {
     addPlayerFormContainer.style.display = 'block';
@@ -28,15 +60,17 @@ cancelPlayerBtn.addEventListener('click', () => {
 
 addPlayerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('playerName').value;
-    const role = document.getElementById('playerRole').value;
-    const battingStyle = document.getElementById('battingStyle').value;
-    const bowlingStyle = document.getElementById('bowlingStyle').value;
+    const userId = document.getElementById('playerSelect').value;
+
+    if (!userId) {
+        alert('Please select a player');
+        return;
+    }
 
     try {
         await fetchAPI(`/teams/${teamId}/players`, {
             method: 'POST',
-            body: JSON.stringify({ name, role, battingStyle, bowlingStyle })
+            body: JSON.stringify({ userId })
         });
 
         // Reset form and reload
@@ -49,9 +83,26 @@ addPlayerForm.addEventListener('submit', async (e) => {
     }
 });
 
+const deleteTeamBtn = document.getElementById('deleteTeamBtn');
+deleteTeamBtn.addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete this team? All associated players will be permanently removed!')) {
+        try {
+            await fetchAPI(`/teams/${teamId}`, { method: 'DELETE' });
+            window.location.href = 'teams.html';
+        } catch (error) {
+            alert('Failed to delete team: ' + error.message);
+        }
+    }
+});
+
 async function loadTeamDetails() {
     try {
         const team = await fetchAPI(`/teams/${teamId}`);
+
+        const loggedInUser = JSON.parse(localStorage.getItem('user'));
+        if (team.createdBy === loggedInUser._id) {
+            deleteTeamBtn.style.display = 'inline-block';
+        }
 
         teamHeader.innerHTML = `
             <h1 style="color: var(--primary-color);">${team.name}</h1>

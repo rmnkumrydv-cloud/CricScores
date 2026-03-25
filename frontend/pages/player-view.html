@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Stats - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .player-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <nav class="navbar glass">
+        <div class="nav-content container">
+            <a href="../dashboard.html" class="logo">Cric<span>Scores</span></a>
+        </div>
+    </nav>
+
+    <div class="container animate-fade" style="margin-top: 40px;">
+        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+            <a href="javascript:history.back()" class="btn-icon" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 50%; min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;">←</a>
+            <h2 style="font-weight: 800; font-size: 2.2rem; margin: 0; letter-spacing: -1px;">Player Profile</h2>
+        </div>
+
+        <div id="playerHeader" class="player-header animate-slide-up">
+            <img id="playerPic" src="" alt="Player" class="player-avatar">
+            <div>
+                <h1 id="playerName" style="margin: 0; font-size: 2.5rem; font-weight: 800;">Loading...</h1>
+                <p id="playerUsername" style="color: var(--primary-color); font-weight: 600; margin: 5px 0; font-size: 1.1rem;">@loading</p>
+                <div style="display: flex; gap: 15px; margin-top: 10px;">
+                    <span id="playerRole" class="badge" style="background: rgba(255,255,255,0.1);">Role</span>
+                    <span id="playerAge" class="badge" style="background: rgba(0,200,83,0.1); color: #00c853;">Age: --</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">📊 Career Statistics</div>
+        
+        <div class="stat-grid">
+            <div class="stat-card glass">
+                <span class="stat-label">Matches</span>
+                <span id="statMatches" class="stat-value">0</span>
+            </div>
+            <div class="stat-card glass" style="border-top: 3px solid #ffab00;">
+                <span class="stat-label">Total Runs</span>
+                <span id="statRuns" class="stat-value">0</span>
+            </div>
+            <div class="stat-card glass" style="border-top: 3px solid #00c853;">
+                <span class="stat-label">Total Wickets</span>
+                <span id="statWickets" class="stat-value">0</span>
+            </div>
+            <div class="stat-card glass" style="border-top: 3px solid var(--primary-color);">
+                <span class="stat-label">Strike Rate</span>
+                <span id="statSR" class="stat-value">0.0</span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <div class="card glass">
+                <h3 style="margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">Batting Breakdown</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Balls Faced</span>
+                        <span id="statBalls" style="font-weight: 700;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Fours (4s)</span>
+                        <span id="statFours" style="font-weight: 700;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Sixes (6s)</span>
+                        <span id="statSixes" style="font-weight: 700;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Batting Style</span>
+                        <span id="battingStyle" style="color: var(--primary-color);">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card glass">
+                <h3 style="margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">Bowling Breakdown</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Overs Bowled</span>
+                        <span id="statOvers" style="font-weight: 700;">0.0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Runs Conceded</span>
+                        <span id="statEconomy" style="font-weight: 700;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Best Bowling</span>
+                        <span style="font-weight: 700;">N/A</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Bowling Style</span>
+                        <span id="bowlingStyle" style="color: var(--primary-color);">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/player-view.js"></script>
+</body>
+</html>

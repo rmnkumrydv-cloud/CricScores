@@ -1,5 +1,6 @@
 const Team = require('../models/Team');
 const Player = require('../models/Player');
+const User = require('../models/User');
 
 // @desc    Get all teams
 // @route   GET /api/teams
@@ -54,7 +55,7 @@ const createTeam = async (req, res, next) => {
 // @access  Private
 const addPlayerToTeam = async (req, res, next) => {
     try {
-        const { name, role, battingStyle, bowlingStyle } = req.body;
+        const { userId } = req.body;
         const team = await Team.findById(req.params.id);
 
         if (!team) {
@@ -67,12 +68,24 @@ const addPlayerToTeam = async (req, res, next) => {
             throw new Error('User not authorized');
         }
 
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'player') {
+            res.status(400);
+            throw new Error('Invalid user selected or user is not registered as a player');
+        }
+
+        if (!user.isVerified) {
+            res.status(400);
+            throw new Error('This player has not verified their profile. They must provide all details in their profile page first.');
+        }
+
         const player = await Player.create({
-            name,
-            role,
-            battingStyle,
-            bowlingStyle,
+            name: user.name,
+            role: user.playerRole || 'All-rounder',
+            battingStyle: user.battingStyle || 'Right-hand bat',
+            bowlingStyle: user.bowlingStyle || 'None',
             team: team._id,
+            userRef: user._id,
             createdBy: req.user.id,
         });
 
@@ -117,11 +130,42 @@ const getTeamPlayers = async (req, res, next) => {
     }
 };
 
+// @desc    Delete a team
+// @route   DELETE /api/teams/:id
+// @access  Private
+const deleteTeam = async (req, res, next) => {
+    try {
+        const team = await Team.findById(req.params.id);
+
+        if (!team) {
+            res.status(404);
+            throw new Error('Team not found');
+        }
+
+        // Check for user
+        if (team.createdBy.toString() !== req.user.id) {
+            res.status(401);
+            throw new Error('User not authorized to delete this team');
+        }
+
+        // Delete associated players first
+        await Player.deleteMany({ team: team._id });
+        
+        // Delete team
+        await team.deleteOne();
+
+        res.status(200).json({ id: req.params.id, message: 'Team and associated players deleted' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getTeams,
     getMyTeams,
     createTeam,
     addPlayerToTeam,
     getTeamById,
-    getTeamPlayers
+    getTeamPlayers,
+    deleteTeam
 };

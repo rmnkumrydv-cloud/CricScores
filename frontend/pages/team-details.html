@@ -13,13 +13,15 @@
     <nav class="navbar">
         <div class="logo"><a href="../index.html">CricScores</a></div>
         <div class="nav-links">
+            <a href="discover.html">Explore</a>
             <a href="teams.html">My Teams</a>
             <a href="../dashboard.html">Dashboard</a>
             <a href="#" onclick="logout()">Logout</a>
         </div>
     </nav>
 
-    <div class="container animate-fade" style="margin-top: 40px;">
+    <div class="container animate-fade" style="margin-top: 40px; position: relative;">
+        <a href="teams.html" class="back-btn" title="Back to Teams" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
         <div id="teamHeader" class="glass" style="margin-bottom: 30px; padding: 30px; border-radius: 20px;">
             <!-- Team info loaded here -->
             <p>Loading...</p>
@@ -27,7 +29,10 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3>Players</h3>
-            <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
+            <div>
+                <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
+                <button id="deleteTeamBtn" class="btn" style="background: var(--error-color); color: white; display: none;">Delete Team</button>
+            </div>
         </div>
 
         <!-- Add Player Form -->
@@ -36,38 +41,13 @@
             <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Add New Player</h3>
             <form id="addPlayerForm">
                 <div class="form-group">
-                    <label for="playerName">Player Name</label>
-                    <input type="text" id="playerName" required>
-                </div>
-                <div class="form-group">
-                    <label for="playerRole">Role</label>
-                    <select id="playerRole"
-                        style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
-                        <option value="Batsman">Batsman</option>
-                        <option value="Bowler">Bowler</option>
-                        <option value="All-rounder" selected>All-rounder</option>
-                        <option value="Wicketkeeper">Wicketkeeper</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="battingStyle">Batting Style</label>
-                    <select id="battingStyle"
-                        style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
-                        <option value="Right-hand bat">Right-hand bat</option>
-                        <option value="Left-hand bat">Left-hand bat</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="bowlingStyle">Bowling Style</label>
-                    <select id="bowlingStyle"
-                        style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
-                        <option value="None">None</option>
-                        <option value="Right-arm fast">Right-arm fast</option>
-                        <option value="Right-arm medium">Right-arm medium</option>
-                        <option value="Right-arm spin">Right-arm spin</option>
-                        <option value="Left-arm fast">Left-arm fast</option>
-                        <option value="Left-arm spin">Left-arm spin</option>
-                    </select>
+                    <label for="playerSelect">Select Registered Player</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="playerSelect" required style="flex: 1; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
+                            <option value="">Loading players...</option>
+                        </select>
+                        <a id="viewStatsLink" href="#" target="_blank" class="btn" style="display: none; background: rgba(255,255,255,0.05); padding: 8px 15px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; color: white;">👁️ View Stats</a>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button type="submit" class="btn btn-primary">Add Player</button>

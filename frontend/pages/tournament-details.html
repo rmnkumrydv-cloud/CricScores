@@ -19,15 +19,18 @@
         </div>
     </nav>
 
-    <div class="container animate-fade" style="margin-top: 40px;">
+    <div class="container animate-fade" style="margin-top: 40px; position: relative;">
+        <a href="tournaments.html" class="back-btn" title="Back to Tournaments" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
         <div id="tournamentHeader" class="glass" style="margin-bottom: 30px; padding: 30px; border-radius: 20px;">
             <p>Loading...</p>
         </div>
 
-        <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+        <div style="display: flex; gap: 20px; margin-bottom: 30px; align-items: center;">
             <button class="btn btn-primary" onclick="showTab('teams')">Teams</button>
             <button class="btn btn-secondary" onclick="showTab('fixtures')">Fixtures</button>
             <button class="btn btn-secondary" onclick="showTab('standings')">Standings</button>
+            <div style="flex-grow: 1;"></div>
+            <button id="deleteTournamentBtn" class="btn" style="background: var(--error-color); color: white; display: none;">Delete Tournament</button>
         </div>
 
         <!-- Teams Tab -->

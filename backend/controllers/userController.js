@@ -1,40 +1,63 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Player = require('../models/Player');
+const Match = require('../models/Match');
+const Tournament = require('../models/Tournament');
 
 // @desc    Register new user
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, username, email, password, role, signupCode } = req.body;
 
-        if (!name || !email || !password) {
+        if (!name || !username || !email || !password) {
             res.status(400);
-            throw new Error('Please add all fields');
+            throw new Error('Please add all required fields');
         }
 
-        // Check if user exists
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ 
+            $or: [{ email }, { username }] 
+        });
 
         if (userExists) {
             res.status(400);
-            throw new Error('User already exists');
+            throw new Error('User with this email or username already exists');
         }
 
-        // Create user
+        let finalRole = 'player';
+        if (role === 'umpire') {
+            const validSignupCode = process.env.UMPIRE_SIGNUP_CODE || 'UMPIRE2026';
+            if (signupCode !== validSignupCode) {
+                res.status(400);
+                throw new Error('Invalid Umpire Signup Code');
+            }
+            finalRole = 'umpire';
+        }
+
         const user = await User.create({
             name,
+            username,
             email,
             password,
+            role: finalRole,
+            playerRole: 'All-rounder',
+            battingStyle: 'Right-hand bat',
+            bowlingStyle: 'None',
+            profilePic: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
         });
 
         if (user) {
             res.status(201).json({
                 _id: user.id,
                 name: user.name,
+                username: user.username,
                 email: user.email,
-                token: generateToken(user._id),
+                role: user.role,
+                profilePic: user.profilePic,
+                isVerified: user.isVerified,
+                token: generateToken(user.id),
             });
         } else {
             res.status(400);
@@ -51,16 +74,18 @@ const registerUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-
-        // Check for user email
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
             res.json({
                 _id: user.id,
                 name: user.name,
+                username: user.username,
                 email: user.email,
-                token: generateToken(user._id),
+                role: user.role,
+                profilePic: user.profilePic,
+                isVerified: user.isVerified,
+                token: generateToken(user.id),
             });
         } else {
             res.status(401);
@@ -76,7 +101,239 @@ const loginUser = async (req, res, next) => {
 // @access  Private
 const getMe = async (req, res, next) => {
     try {
-        res.status(200).json(req.user);
+        const u = req.user;
+        res.status(200).json({
+            _id: u._id,
+            name: u.name,
+            username: u.username,
+            email: u.email,
+            role: u.role,
+            age: u.age,
+            profilePic: u.profilePic,
+            isVerified: u.isVerified,
+            playerRole: u.playerRole,
+            battingStyle: u.battingStyle,
+            bowlingStyle: u.bowlingStyle,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get all players
+// @route   GET /api/users/players
+// @access  Public
+const getPlayers = async (req, res, next) => {
+    try {
+        const players = await User.find({ role: 'player', isVerified: true }).select('-password');
+        res.status(200).json(players);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get all umpires
+// @route   GET /api/users/umpires
+// @access  Public
+const getUmpires = async (req, res, next) => {
+    try {
+        const umpires = await User.find({ role: 'umpire' }).select('-password');
+        res.status(200).json(umpires);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        user.name = req.body.name || user.name;
+        user.age = req.body.age !== undefined ? req.body.age : user.age;
+        user.isVerified = req.body.isVerified !== undefined ? req.body.isVerified : user.isVerified;
+        if (req.body.profilePic) {
+            user.profilePic = req.body.profilePic;
+        }
+
+        if (user.role === 'player') {
+            user.playerRole = req.body.playerRole || user.playerRole;
+            user.battingStyle = req.body.battingStyle || user.battingStyle;
+            user.bowlingStyle = req.body.bowlingStyle || user.bowlingStyle;
+        }
+
+        const updatedUser = await user.save();
+        
+        res.status(200).json({
+            _id: updatedUser.id,
+            name: updatedUser.name,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            age: updatedUser.age,
+            isVerified: updatedUser.isVerified,
+            profilePic: updatedUser.profilePic,
+            playerRole: updatedUser.playerRole,
+            battingStyle: updatedUser.battingStyle,
+            bowlingStyle: updatedUser.bowlingStyle,
+            token: generateToken(updatedUser.id)
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get user lifetime stats
+// @route   GET /api/users/me/stats
+// @access  Private
+const getUserStats = async (req, res, next) => {
+    try {
+        if (req.user.role === 'umpire') {
+            const matchesUmpired = await Match.countDocuments({ createdBy: req.user.id });
+            const tournamentsManaged = await Tournament.countDocuments({ createdBy: req.user.id });
+            return res.status(200).json({
+                role: 'umpire',
+                matchesUmpired,
+                tournamentsManaged
+            });
+        }
+
+        const userPlayers = await Player.find({ userRef: req.user.id }).select('_id');
+        const playerIds = userPlayers.map(p => p._id);
+        
+        if (playerIds.length === 0) {
+            return res.status(200).json({
+                role: 'player',
+                matchesPlayed: 0, totalRuns: 0, ballsFaced: 0, fours: 0, sixes: 0,
+                totalWickets: 0, runsConceded: 0, oversBowled: 0
+            });
+        }
+
+        const battingAggregation = await Match.aggregate([
+            { $unwind: "$innings" },
+            { $unwind: "$innings.battingStats" },
+            { $match: { "innings.battingStats.player": { $in: playerIds } } },
+            {
+                $group: {
+                    _id: null,
+                    totalRuns: { $sum: "$innings.battingStats.runs" },
+                    matches: { $addToSet: "$_id" },
+                    ballsFaced: { $sum: "$innings.battingStats.balls" },
+                    fours: { $sum: "$innings.battingStats.fours" },
+                    sixes: { $sum: "$innings.battingStats.sixes" }
+                }
+            }
+        ]);
+
+        const bowlingAggregation = await Match.aggregate([
+            { $unwind: "$innings" },
+            { $unwind: "$innings.bowlingStats" },
+            { $match: { "innings.bowlingStats.player": { $in: playerIds } } },
+            {
+                $group: {
+                    _id: null,
+                    totalWickets: { $sum: "$innings.bowlingStats.wickets" },
+                    oversBowled: { $sum: "$innings.bowlingStats.overs" },
+                    runsConceded: { $sum: "$innings.bowlingStats.runsConceded" },
+                    matches: { $addToSet: "$_id" }
+                }
+            }
+        ]);
+
+        const batting = battingAggregation[0] || { matches: [], totalRuns: 0, ballsFaced: 0, fours: 0, sixes: 0 };
+        const bowling = bowlingAggregation[0] || { matches: [], totalWickets: 0, oversBowled: 0, runsConceded: 0 };
+
+        const combinedMatches = new Set([
+            ...(batting.matches || []),
+            ...(bowling.matches || [])
+        ]);
+
+        res.status(200).json({
+            matchesPlayed: combinedMatches.size,
+            totalRuns: batting.totalRuns,
+            ballsFaced: batting.ballsFaced,
+            fours: batting.fours,
+            sixes: batting.sixes,
+            totalWickets: bowling.totalWickets,
+            oversBowled: bowling.oversBowled,
+            runsConceded: bowling.runsConceded
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get public player lifetime stats by User ID
+// @route   GET /api/users/:id/stats
+// @access  Public
+const getPlayerStats = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const userPlayers = await Player.find({ userRef: userId }).select('_id');
+        const playerIds = userPlayers.map(p => p._id);
+        
+        if (playerIds.length === 0) {
+            return res.status(200).json({
+                matchesPlayed: 0, totalRuns: 0, ballsFaced: 0, fours: 0, sixes: 0,
+                totalWickets: 0, runsConceded: 0, oversBowled: 0
+            });
+        }
+
+        const battingAggregation = await Match.aggregate([
+            { $unwind: "$innings" },
+            { $unwind: "$innings.battingStats" },
+            { $match: { "innings.battingStats.player": { $in: playerIds } } },
+            {
+                $group: {
+                    _id: null,
+                    totalRuns: { $sum: "$innings.battingStats.runs" },
+                    matches: { $addToSet: "$_id" },
+                    ballsFaced: { $sum: "$innings.battingStats.balls" },
+                    fours: { $sum: "$innings.battingStats.fours" },
+                    sixes: { $sum: "$innings.battingStats.sixes" }
+                }
+            }
+        ]);
+
+        const bowlingAggregation = await Match.aggregate([
+            { $unwind: "$innings" },
+            { $unwind: "$innings.bowlingStats" },
+            { $match: { "innings.bowlingStats.player": { $in: playerIds } } },
+            {
+                $group: {
+                    _id: null,
+                    totalWickets: { $sum: "$innings.bowlingStats.wickets" },
+                    oversBowled: { $sum: "$innings.bowlingStats.overs" },
+                    runsConceded: { $sum: "$innings.bowlingStats.runsConceded" },
+                    matches: { $addToSet: "$_id" }
+                }
+            }
+        ]);
+
+        const batting = battingAggregation[0] || { matches: [], totalRuns: 0, ballsFaced: 0, fours: 0, sixes: 0 };
+        const bowling = bowlingAggregation[0] || { matches: [], totalWickets: 0, oversBowled: 0, runsConceded: 0 };
+
+        const combinedMatches = new Set([
+            ...(batting.matches || []),
+            ...(bowling.matches || [])
+        ]);
+
+        res.status(200).json({
+            matchesPlayed: combinedMatches.size,
+            totalRuns: batting.totalRuns,
+            ballsFaced: batting.ballsFaced,
+            fours: batting.fours,
+            sixes: batting.sixes,
+            totalWickets: bowling.totalWickets,
+            oversBowled: bowling.oversBowled,
+            runsConceded: bowling.runsConceded
+        });
     } catch (error) {
         next(error);
     }
@@ -93,4 +350,9 @@ module.exports = {
     registerUser,
     loginUser,
     getMe,
+    getUmpires,
+    getPlayers,
+    updateUserProfile,
+    getUserStats,
+    getPlayerStats
 };

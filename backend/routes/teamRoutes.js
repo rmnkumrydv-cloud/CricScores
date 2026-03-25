@@ -6,13 +6,14 @@ const {
     createTeam,
     addPlayerToTeam,
     getTeamById,
-    getTeamPlayers
+    getTeamPlayers,
+    deleteTeam
 } = require('../controllers/teamController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
-router.route('/').get(getTeams).post(protect, createTeam);
+router.route('/').get(getTeams).post(protect, restrictTo('umpire'), createTeam);
 router.get('/my', protect, getMyTeams);
-router.route('/:id').get(getTeamById);
+router.route('/:id').get(getTeamById).delete(protect, deleteTeam);
 router.route('/:id/players')
     .get(getTeamPlayers)
     .post(protect, addPlayerToTeam);

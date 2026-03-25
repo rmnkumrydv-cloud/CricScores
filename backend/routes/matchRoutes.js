@@ -10,17 +10,17 @@ const {
     updateCurrentPlayers,
     undoBall,
 } = require('../controllers/matchController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getMatches);
 
-router.post('/initialize', protect, initializeMatch);
+router.post('/initialize', protect, restrictTo('umpire'), initializeMatch);
 router.route('/:id').get(getMatchById);
-router.put('/:id/start', protect, startMatch);
-router.put('/:id/players', protect, updateCurrentPlayers);
-router.post('/:id/ball', protect, recordBall);
-router.put('/:id/pom', protect, setPlayerOfTheMatch);
-router.put('/:id/undo', protect, undoBall);
+router.put('/:id/start', protect, restrictTo('umpire'), startMatch);
+router.put('/:id/players', protect, restrictTo('umpire'), updateCurrentPlayers);
+router.post('/:id/ball', protect, restrictTo('umpire'), recordBall);
+router.put('/:id/pom', protect, restrictTo('umpire'), setPlayerOfTheMatch);
+router.put('/:id/undo', protect, restrictTo('umpire'), undoBall);
 
 module.exports = router;

@@ -18,10 +18,11 @@
         </div>
     </nav>
 
-    <div class="container animate-fade" style="margin-top: 40px;">
+    <div class="container animate-fade" style="margin-top: 40px; position: relative;">
+        <a href="../dashboard.html" class="back-btn" title="Back to Dashboard" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
             <h2 style="font-weight: 800; font-size: 2.2rem; letter-spacing: -1px;">My Teams</h2>
-            <button id="createTeamBtn" class="btn btn-primary" style="padding: 12px 25px; border-radius: 10px;">Create
+            <button id="createTeamBtn" class="btn btn-primary" style="padding: 12px 25px; border-radius: 10px; display: none;">Create
                 New Team</button>
         </div>
 
@@ -38,7 +39,18 @@
                     <label for="teamCity">City / Location</label>
                     <input type="text" id="teamCity">
                 </div>
-                <div style="display: flex; gap: 10px;">
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Add Players (Optional)</label>
+                    <input type="text" id="playerSearch" placeholder="Search verified players by name or @username" style="margin-bottom: 5px;" autocomplete="off">
+                    <div id="searchResults" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 8px; z-index: 10;"></div>
+                    
+                    <div id="selectedPlayersContainer" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                        <!-- Selected player chips will appear here -->
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="submit" class="btn btn-primary">Save Team</button>
                     <button type="button" id="cancelCreateBtn" class="btn btn-secondary">Cancel</button>
                 </div>

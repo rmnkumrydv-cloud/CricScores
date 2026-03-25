@@ -6,18 +6,20 @@ const {
     createTournament,
     addTeamToTournament,
     getTournamentStandings,
+    deleteTournament,
 } = require('../controllers/tournamentController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getTournaments)
-    .post(protect, createTournament);
+    .post(protect, restrictTo('umpire'), createTournament);
 
 router.route('/:id')
-    .get(getTournamentById);
+    .get(getTournamentById)
+    .delete(protect, restrictTo('umpire'), deleteTournament);
 
 router.route('/:id/teams')
-    .post(protect, addTeamToTournament);
+    .post(protect, restrictTo('umpire'), addTeamToTournament);
 
 router.route('/:id/standings')
     .get(getTournamentStandings);

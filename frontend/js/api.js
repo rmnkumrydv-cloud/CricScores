@@ -2,14 +2,15 @@ const API_URL = 'http://localhost:5000/api';
 
 async function fetchAPI(endpoint, options = {}) {
     const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token') || (user ? user.token : null);
 
     const headers = {
         'Content-Type': 'application/json',
         ...options.headers
     };
 
-    if (user && user.token) {
-        headers['Authorization'] = `Bearer ${user.token}`;
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
     }
 
     const config = {
@@ -23,7 +24,7 @@ async function fetchAPI(endpoint, options = {}) {
 
         if (!response.ok) {
             if (response.status === 401) {
-                localStorage.removeItem('user');
+                clearUser();
                 // Only redirect if not already on a login/register page and not index
                 const path = window.location.pathname;
                 if (!path.includes('login.html') && !path.includes('register.html') && !path.endsWith('/') && !path.endsWith('index.html')) {
@@ -38,4 +39,16 @@ async function fetchAPI(endpoint, options = {}) {
         console.error('API Error:', error);
         throw error;
     }
+}
+
+function saveUser(userData) {
+    if (userData.token) {
+        localStorage.setItem('token', userData.token);
+    }
+    localStorage.setItem('user', JSON.stringify(userData));
+}
+
+function clearUser() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
 }

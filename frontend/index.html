@@ -5,37 +5,430 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CricScores - Professional Cricket Scoring</title>
+    <meta name="description" content="Professional cricket scoring, tournament management, and live analytics. Join CricScores today.">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Hero with stadium background */
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('images/stadium_bg.png');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.35);
+            z-index: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(8,12,20,0.2) 0%, rgba(8,12,20,0.85) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0,255,136,0.1);
+            border: 1px solid rgba(0,255,136,0.3);
+            color: var(--primary-color);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 8vw, 6.5rem);
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+
+        .hero-title span {
+            color: var(--primary-color);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-stats {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            padding: 30px;
+            margin-top: -60px;
+            background: rgba(8,12,20,0.7);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0,255,136,0.15);
+        }
+
+        .hero-stat { text-align: center; }
+        .hero-stat-value { font-size: 2.2rem; font-weight: 900; color: var(--primary-color); }
+        .hero-stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Features section */
+        #features {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.3);
+            color: var(--secondary-color);
+            padding: 5px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 15px;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 35px 30px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover { transform: translateY(-6px); border-color: rgba(0,255,136,0.15); }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card.green::before { background: var(--primary-color); }
+        .feature-card.blue::before { background: var(--secondary-color); }
+        .feature-card.red::before { background: var(--accent-red); }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Roles section */
+        .roles-section {
+            padding: 80px 0;
+            background: rgba(0, 255, 136, 0.02);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .role-card {
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        .role-card.player { background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.15); }
+        .role-card.umpire { background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.15); }
+
+        .role-card h3 { font-size: 1.6rem; font-weight: 800; margin: 15px 0 10px; }
+        .role-card p { color: var(--text-secondary); margin-bottom: 20px; }
+        .role-card ul { list-style: none; text-align: left; margin-bottom: 25px; }
+        .role-card ul li { padding: 6px 0; font-size: 0.9rem; color: var(--text-secondary); }
+        .role-card ul li::before { content: '✓ '; color: var(--primary-color); font-weight: 800; }
+        .role-card.umpire ul li::before { color: var(--secondary-color); }
+
+        /* CTA Banner */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,212,255,0.08));
+            border: 1px solid rgba(0,255,136,0.15);
+            border-radius: 28px;
+            padding: 70px 40px;
+            max-width: 750px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '🏏';
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.03;
+            top: -30px;
+            right: -30px;
+            line-height: 1;
+        }
+
+        .cta-box h2 { font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 15px; }
+        .cta-box p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 35px; }
+
+        /* Footer */
+        footer {
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-stats { gap: 30px; flex-wrap: wrap; }
+            .roles-grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 2rem; }
+            .cta-box h2 { font-size: 1.8rem; }
+        }
+    </style>
 </head>
 
 <body>
     <nav class="navbar">
-        <div class="logo">CricScores</div>
-        <div class="nav-links" id="navLinks">
-            <a href="index.html">Home</a>
-            <a href="pages/login.html" class="btn btn-secondary">Login</a>
-            <a href="pages/register.html" class="btn btn-primary">Sign Up</a>
+        <div class="nav-content container">
+            <a href="index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="active">Home</a>
+                <a href="pages/login.html" class="btn btn-secondary" style="border-radius: 20px; padding: 8px 25px;">Login</a>
+                <a href="pages/register.html" class="btn btn-primary" style="border-radius: 20px; padding: 8px 25px;">Sign Up</a>
+            </div>
         </div>
     </nav>
 
-    <section class="hero animate-fade">
-        <div class="container">
-            <h1 style="font-size: 5rem; font-weight: 800; letter-spacing: -2px;">CricScores</h1>
-            <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 40px; color: var(--text-secondary);">
-                Experience professional-grade cricket scoring, tournament management, and detailed analytics. Join
-                existing tournaments or start your own league today.</p>
-            <div style="display: flex; gap: 20px; justify-content: center;">
-                <a href="pages/register.html" class="btn btn-primary"
-                    style="padding: 15px 40px; border-radius: 12px; font-size: 1.1rem;">Get Started</a>
-                <a href="#features" class="btn btn-secondary"
-                    style="padding: 15px 40px; border-radius: 12px; font-size: 1.1rem; border-color: rgba(255,255,255,0.1); color: var(--text-primary);">Learn
-                    More</a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content animate-fade">
+            <div class="hero-badge">🏏 Live Cricket Platform</div>
+            <h1 class="hero-title">Cric<span>Scores</span></h1>
+            <p class="hero-subtitle">
+                The ultimate platform for professional cricket scoring, real-time match analytics, 
+                and tournament management. Played by players. Powered by umpires.
+            </p>
+            <div class="hero-cta">
+                <a href="pages/register.html" class="btn btn-primary" style="padding: 16px 45px; border-radius: 14px; font-size: 1.1rem; font-weight: 800;">
+                    Get Started Free
+                </a>
+                <a href="#features" class="btn btn-secondary" style="padding: 16px 45px; border-radius: 14px; font-size: 1.1rem; border-color: rgba(255,255,255,0.15); color: white;">
+                    Learn More ↓
+                </a>
             </div>
         </div>
     </section>
+
+    <!-- Stats Bar -->
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-value">Live</div>
+            <div class="hero-stat-label">Ball-by-Ball Scoring</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">Real-time</div>
+            <div class="hero-stat-label">Match Analytics</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">Full</div>
+            <div class="hero-stat-label">Tournament Support</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-value">Free</div>
+            <div class="hero-stat-label">To Join</div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Platform Features</div>
+                <h2 class="section-title">Everything Cricket Needs</h2>
+                <p class="section-desc">From registering your first match to managing a full tournament, CricScores has every tool you need.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card green">
+                    <span class="feature-icon">🏏</span>
+                    <h3>Live Ball-by-Ball Scoring</h3>
+                    <p>Record every ball with Wides, No-Balls, Sixes, Fours, and wicket types. Real-time scorecard updates for every delivery of the match.</p>
+                </div>
+                <div class="feature-card blue">
+                    <span class="feature-icon">📊</span>
+                    <h3>Advanced Match Analytics</h3>
+                    <p>Track Current Run Rate, Required Run Rate, Win Probability, and projected scores. Full batting and bowling scorecards after every match.</p>
+                </div>
+                <div class="feature-card green">
+                    <span class="feature-icon">🏆</span>
+                    <h3>Tournament Management</h3>
+                    <p>Umpires can organize full tournaments, create fixtures, manage multiple teams, and track standings — all in one place.</p>
+                </div>
+                <div class="feature-card blue">
+                    <span class="feature-icon">👤</span>
+                    <h3>Player Profiles & Stats</h3>
+                    <p>Every player gets a lifetime stats profile — runs, wickets, strike rate, economy. Build your cricketing portfolio with every match.</p>
+                </div>
+                <div class="feature-card red">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Discover Matches</h3>
+                    <p>Search for matches and tournaments by location or name. Players can find their next game and umpires can find talent from one dashboard.</p>
+                </div>
+                <div class="feature-card green">
+                    <span class="feature-icon">🥇</span>
+                    <h3>Global Leaderboards</h3>
+                    <p>Top batsmen and bowlers ranked globally. Compete to be the best on the platform and showcase your talent to the world.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roles Section -->
+    <section class="roles-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Two Roles</div>
+                <h2 class="section-title">Built for Everyone</h2>
+                <p class="section-desc">Whether you're stepping onto the pitch or officiating from the boundary, CricScores has a role for you.</p>
+            </div>
+            <div class="roles-grid">
+                <div class="role-card player">
+                    <span style="font-size: 3rem;">🏏</span>
+                    <h3 style="color: var(--primary-color);">Player</h3>
+                    <p>Register your cricket identity and track your career.</p>
+                    <ul>
+                        <li>View lifetime batting & bowling statistics</li>
+                        <li>Get discovered by umpires hosting matches</li>
+                        <li>Search for matches and tournaments</li>
+                        <li>Appear on global leaderboards</li>
+                        <li>Build your professional cricket profile</li>
+                    </ul>
+                    <a href="pages/register.html" class="btn btn-primary" style="width: 100%; text-align: center; padding: 14px; border-radius: 12px;">Join as Player</a>
+                </div>
+                <div class="role-card umpire">
+                    <span style="font-size: 3rem;">🎯</span>
+                    <h3 style="color: var(--secondary-color);">Umpire</h3>
+                    <p>Host and manage matches with complete officiating tools.</p>
+                    <ul>
+                        <li>Create and manage teams & tournaments</li>
+                        <li>Start matches and score ball-by-ball</li>
+                        <li>Select players from verified profiles</li>
+                        <li>Declare winners and award Player of the Match</li>
+                        <li>Track your officiating career stats</li>
+                    </ul>
+                    <a href="pages/register.html" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 14px; border-radius: 12px; background: rgba(0,212,255,0.1);">Join as Umpire</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box">
+                <h2>Ready to Play?</h2>
+                <p>Join thousands of cricketers already scoring their legacy on CricScores. It's free to join.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="pages/register.html" class="btn btn-primary" style="padding: 15px 40px; border-radius: 14px; font-size: 1rem; font-weight: 800;">Create Free Account</a>
+                    <a href="pages/login.html" class="btn btn-secondary" style="padding: 15px 40px; border-radius: 14px; font-size: 1rem;">Already have an account?</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">Cric<span style="color: var(--primary-color);">Scores</span></p>
+            <p>© 2026 CricScores. Built for the love of cricket.</p>
+        </div>
+    </footer>
 
     <script src="js/api.js"></script>
     <script>
@@ -44,17 +437,30 @@
         const navLinks = document.getElementById('navLinks');
 
         if (user) {
+            const displayName = user.name || user.username || 'User';
+            const picUrl = user.profilePic && !user.profilePic.includes('undefined')
+                ? user.profilePic
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
+
             navLinks.innerHTML = `
-                <a href="dashboard.html">Dashboard</a>
-                <a href="#" onclick="logout()">Logout</a>
-                <div style="width: 40px; height: 40px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold;">
-                    ${user.name.charAt(0).toUpperCase()}
+                <a href="${user.role === 'umpire' ? 'umpire-dashboard.html' : 'dashboard.html'}">Dashboard</a>
+                <div class="user-profile" onclick="window.location.href='pages/profile.html'">
+                    <img src="${picUrl}" alt="Profile">
+                    <span>${displayName}</span>
                 </div>
             `;
         }
 
+        // Smooth scroll for Learn More
+        document.querySelectorAll('a[href="#features"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
         function logout() {
-            localStorage.removeItem('user');
+            clearUser();
             window.location.reload();
         }
     </script>

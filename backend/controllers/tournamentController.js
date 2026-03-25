@@ -7,7 +7,12 @@ const Match = require('../models/Match');
 // @access  Public
 const getTournaments = async (req, res, next) => {
     try {
-        const tournaments = await Tournament.find();
+        const { q } = req.query;
+        const query = {};
+        if (q) {
+            query.name = { $regex: q, $options: 'i' };
+        }
+        const tournaments = await Tournament.find(query);
         res.status(200).json(tournaments);
     } catch (error) {
         next(error);
@@ -35,6 +40,10 @@ const getTournamentById = async (req, res, next) => {
 // @access  Private
 const createTournament = async (req, res, next) => {
     try {
+        if (req.user.role !== 'umpire') {
+            res.status(403);
+            throw new Error('Only umpires can create tournaments');
+        }
         const { name, organizer, startDate, endDate, teamIds } = req.body;
 
         if (!name || !organizer || !startDate || !endDate) {
@@ -172,10 +181,38 @@ const getTournamentStandings = async (req, res, next) => {
     }
 };
 
+// @desc    Delete a tournament
+// @route   DELETE /api/tournaments/:id
+// @access  Private
+const deleteTournament = async (req, res, next) => {
+    try {
+        const tournament = await Tournament.findById(req.params.id);
+
+        if (!tournament) {
+            res.status(404);
+            throw new Error('Tournament not found');
+        }
+
+        // Check for user
+        if (tournament.createdBy.toString() !== req.user.id) {
+            res.status(401);
+            throw new Error('User not authorized to delete this tournament');
+        }
+        
+        // Delete tournament
+        await tournament.deleteOne();
+
+        res.status(200).json({ id: req.params.id, message: 'Tournament deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getTournaments,
     getTournamentById,
     createTournament,
     addTeamToTournament,
     getTournamentStandings,
+    deleteTournament
 };

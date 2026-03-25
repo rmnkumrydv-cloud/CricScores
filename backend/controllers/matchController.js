@@ -40,6 +40,10 @@ const populateMatch = async (match) => {
 // @access  Private
 const initializeMatch = async (req, res, next) => {
     try {
+        if (req.user.role !== 'umpire') {
+            res.status(403);
+            throw new Error('Only umpires can initialize matches');
+        }
         const { team1Id, team2Id, playingXI1, playingXI2, tournamentId, date, venue, totalOvers } = req.body;
 
         if (playingXI1.length !== 11 || playingXI2.length !== 11) {
@@ -327,10 +331,15 @@ const setPlayerOfTheMatch = async (req, res, next) => {
 
 const getMatches = async (req, res, next) => {
     try {
-        const { tournamentId, limit, status } = req.query;
+        const { tournamentId, limit, status, q } = req.query;
         const query = {};
         if (tournamentId) query.tournament = tournamentId;
         if (status) query.status = status;
+        if (q) {
+            query.$or = [
+                { venue: { $regex: q, $options: 'i' } }
+            ];
+        }
 
         const matches = await Match.find(query)
             .sort({ createdAt: -1 })

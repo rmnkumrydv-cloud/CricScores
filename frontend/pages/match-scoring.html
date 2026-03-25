@@ -262,8 +262,17 @@
     </style>
 </head>
 
-<body>
-    <div class="container animate-fade">
+<body class="dark-mode">
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="../index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links">
+                <a href="../umpire-dashboard.html">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container animate-fade" style="margin-top: 20px;">
         <header style="display: flex; justify-content: space-between; align-items: center; padding: 30px 0;">
             <div id="matchHeader" style="font-weight: 600; color: var(--text-secondary); font-size: 1.1rem;">Loading
                 Match Details...</div>

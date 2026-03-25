@@ -10,6 +10,7 @@ const addTeamFormContainer = document.getElementById('addTeamFormContainer');
 const addTeamForm = document.getElementById('addTeamForm');
 const cancelTeamBtn = document.getElementById('cancelTeamBtn');
 const teamSelect = document.getElementById('teamSelect');
+const deleteTournamentBtn = document.getElementById('deleteTournamentBtn');
 
 const createMatchBtn = document.getElementById('createMatchBtn');
 const createMatchFormContainer = document.getElementById('createMatchFormContainer');
@@ -106,10 +107,26 @@ createMatchForm.addEventListener('submit', async (e) => {
     }
 });
 
+deleteTournamentBtn.addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete this tournament? This action cannot be undone!')) {
+        try {
+            await fetchAPI(`/tournaments/${tournamentId}`, { method: 'DELETE' });
+            window.location.href = 'tournaments.html';
+        } catch (error) {
+            alert('Failed to delete tournament: ' + error.message);
+        }
+    }
+});
+
 async function loadTournamentDetails() {
     try {
         const tournament = await fetchAPI(`/tournaments/${tournamentId}`);
         currentTournament = tournament;
+
+        const loggedInUser = JSON.parse(localStorage.getItem('user'));
+        if (tournament.createdBy === loggedInUser._id) {
+            deleteTournamentBtn.style.display = 'inline-block';
+        }
 
         const start = new Date(tournament.startDate).toLocaleDateString();
         const end = new Date(tournament.endDate).toLocaleDateString();

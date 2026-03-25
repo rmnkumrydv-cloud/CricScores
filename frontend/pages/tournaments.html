@@ -13,13 +13,15 @@
     <nav class="navbar">
         <div class="logo"><a href="../index.html">CricScores</a></div>
         <div class="nav-links">
+            <a href="discover.html">Explore</a>
             <a href="teams.html">My Teams</a>
             <a href="../dashboard.html">Dashboard</a>
             <a href="#" onclick="logout()">Logout</a>
         </div>
     </nav>
 
-    <div class="container animate-fade" style="margin-top: 40px;">
+    <div class="container animate-fade" style="margin-top: 40px; position: relative;">
+        <a href="../dashboard.html" class="back-btn" title="Back to Dashboard" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
             <h2 style="font-weight: 800; font-size: 2.2rem; letter-spacing: -1px;">Tournaments</h2>
             <button id="createTournamentBtn" class="btn btn-primary"
@@ -70,6 +72,10 @@
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
             window.location.href = 'login.html';
+        }
+
+        if (user.role !== 'umpire') {
+            document.getElementById('createTournamentBtn').style.display = 'none';
         }
 
         function logout() {

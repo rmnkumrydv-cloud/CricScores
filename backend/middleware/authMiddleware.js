@@ -18,20 +18,31 @@ const protect = async (req, res, next) => {
             // Get user from the token
             req.user = await User.findById(decoded.id).select('-password');
 
-            next();
+            if (!req.user) {
+                res.status(401);
+                return next(new Error('Not authorized, user not found'));
+            }
+
+            return next();
         } catch (error) {
             console.log(error);
             res.status(401);
-            const err = new Error('Not authorized');
-            next(err);
+            return next(new Error('Not authorized, token invalid'));
         }
-    }
-
-    if (!token) {
+    } else {
         res.status(401);
-        const error = new Error('Not authorized, no token');
-        next(error);
+        return next(new Error('Not authorized, no token'));
     }
 };
+ 
+const restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            res.status(403);
+            return next(new Error(`Role (${req.user.role}) is not authorized to access this resource`));
+        }
+        next();
+    };
+};
 
-module.exports = { protect };
+module.exports = { protect, restrictTo };

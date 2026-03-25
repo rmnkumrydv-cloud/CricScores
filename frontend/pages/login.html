@@ -8,11 +8,27 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body>
-    <div class="container" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
-        <div class="form-container">
-            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary-color);">Login</h2>
+<body class="dark-mode" style="background: radial-gradient(circle at top right, #0a101f 0%, #080c14 100%); overflow: hidden;">
+    <div class="container" style="height: 100vh; display: flex; align-items: center; justify-content: center; position: relative;">
+        <!-- Decorative Elements -->
+        <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: var(--primary-color); filter: blur(150px); opacity: 0.1;"></div>
+        <div style="position: absolute; bottom: -100px; left: -100px; width: 300px; height: 300px; background: var(--secondary-color); filter: blur(150px); opacity: 0.1;"></div>
+
+        <div class="form-container glass animate-fade" style="position: relative; border-radius: 24px; padding: 50px; border: 1px solid rgba(255,255,255,0.05); max-width: 450px;">
+            <a href="../index.html" class="back-btn" title="Back to Home" style="top: 25px; left: 25px;">←</a>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-weight: 900; font-size: 2.5rem; letter-spacing: -1.5px; margin-bottom: 5px;">Cric<span>Scores</span></h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Welcome back, Champ!</p>
+            </div>
+            
+            <div class="tab-container" style="display: flex; margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <button class="tab-btn active" id="playerTab" style="flex: 1; background: var(--primary-color); border: none; color: #000; padding: 12px; cursor: pointer; font-weight: 800; border-radius: 8px; transition: var(--transition);">Player</button>
+                <button class="tab-btn" id="umpireTab" style="flex: 1; background: none; border: none; color: var(--text-secondary); padding: 12px; cursor: pointer; font-weight: 700; border-radius: 8px; transition: var(--transition);">Umpire</button>
+            </div>
+
             <div id="message" class="message" style="display: none;"></div>
+            
+            <!-- Player Login Form -->
             <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email Address</label>
@@ -22,40 +38,103 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login as Player</button>
             </form>
+
+            <!-- Umpire Login Form -->
+            <form id="umpireLoginForm" style="display: none;">
+                <div class="form-group">
+                    <label for="umpireEmail">Email Address</label>
+                    <input type="email" id="umpireEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="umpirePassword">Password</label>
+                    <input type="password" id="umpirePassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; background-color: var(--secondary-color);">Login as Umpire</button>
+            </form>
+
             <p style="margin-top: 20px; text-align: center; color: var(--text-secondary);">
                 Don't have an account? <a href="register.html" style="color: var(--primary-color);">Sign Up</a>
             </p>
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script>
-        const API_URL = 'http://localhost:5000/api';
-
         const loginForm = document.getElementById('loginForm');
+        const umpireLoginForm = document.getElementById('umpireLoginForm');
         const messageDiv = document.getElementById('message');
+        
+        const playerTab = document.getElementById('playerTab');
+        const umpireTab = document.getElementById('umpireTab');
 
+        // Tab Switching Logic
+        playerTab.addEventListener('click', () => {
+            playerTab.style.background = 'var(--primary-color)';
+            playerTab.style.color = '#000';
+            playerTab.style.fontWeight = '800';
+            
+            umpireTab.style.background = 'none';
+            umpireTab.style.color = 'var(--text-secondary)';
+            umpireTab.style.fontWeight = '700';
+            
+            loginForm.style.display = 'block';
+            umpireLoginForm.style.display = 'none';
+        });
+
+        umpireTab.addEventListener('click', () => {
+            umpireTab.style.background = 'var(--secondary-color)';
+            umpireTab.style.color = '#000';
+            umpireTab.style.fontWeight = '800';
+            
+            playerTab.style.background = 'none';
+            playerTab.style.color = 'var(--text-secondary)';
+            playerTab.style.fontWeight = '700';
+            
+            umpireLoginForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        // Player Login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch(`${API_URL}/users/login`, {
+                const data = await fetchAPI('/users/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    localStorage.setItem('user', JSON.stringify(data));
-                    window.location.href = '../dashboard.html';
-                } else {
-                    throw new Error(data.message || 'Login failed');
+                if (data.role === 'umpire') {
+                    throw new Error('Please login through the Umpire tab');
                 }
+                saveUser(data);
+                window.location.href = '../dashboard.html';
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        // Umpire Login
+        umpireLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('umpireEmail').value;
+            const password = document.getElementById('umpirePassword').value;
+
+            try {
+                const data = await fetchAPI('/users/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (data.role !== 'umpire') {
+                    throw new Error('Not an Umpire account. Please login as Player.');
+                }
+                saveUser(data);
+                window.location.href = '../umpire-dashboard.html';
             } catch (error) {
                 showMessage(error.message, 'error');
             }
