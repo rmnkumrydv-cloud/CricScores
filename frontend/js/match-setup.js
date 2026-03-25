@@ -31,6 +31,13 @@ async function init() {
             tournamentSelect.appendChild(opt);
         });
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTourneyId = urlParams.get('tournamentId');
+        if (urlTourneyId) {
+            tournamentSelect.value = urlTourneyId;
+            tournamentSelect.disabled = true; // Lock it in
+        }
+
         teams.forEach(team => {
             const opt1 = document.createElement('option');
             opt1.value = team._id;

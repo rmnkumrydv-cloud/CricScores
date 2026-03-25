@@ -13,11 +13,6 @@ const teamSelect = document.getElementById('teamSelect');
 const deleteTournamentBtn = document.getElementById('deleteTournamentBtn');
 
 const createMatchBtn = document.getElementById('createMatchBtn');
-const createMatchFormContainer = document.getElementById('createMatchFormContainer');
-const createMatchForm = document.getElementById('createMatchForm');
-const cancelMatchBtn = document.getElementById('cancelMatchBtn');
-const team1Select = document.getElementById('team1Select');
-const team2Select = document.getElementById('team2Select');
 
 if (!tournamentId) {
     alert('No tournament specified');
@@ -43,14 +38,7 @@ cancelTeamBtn.addEventListener('click', () => {
 });
 
 createMatchBtn.addEventListener('click', () => {
-    createMatchFormContainer.style.display = 'block';
-    createMatchBtn.style.display = 'none';
-    populateMatchTeams();
-});
-
-cancelMatchBtn.addEventListener('click', () => {
-    createMatchFormContainer.style.display = 'none';
-    createMatchBtn.style.display = 'block';
+    window.location.href = `match-setup.html?tournamentId=${tournamentId}`;
 });
 
 // Add team to tournament
@@ -73,39 +61,7 @@ addTeamForm.addEventListener('submit', async (e) => {
     }
 });
 
-createMatchForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const team1Id = team1Select.value;
-    const team2Id = team2Select.value;
-    const date = document.getElementById('matchDate').value;
-    const venue = document.getElementById('venue').value;
-
-    if (team1Id === team2Id) {
-        alert('Teams must be different');
-        return;
-    }
-
-    try {
-        await fetchAPI('/matches', {
-            method: 'POST',
-            body: JSON.stringify({
-                team1Id,
-                team2Id,
-                tournamentId,
-                date,
-                venue
-            })
-        });
-
-        createMatchForm.reset();
-        createMatchFormContainer.style.display = 'none';
-        createMatchBtn.style.display = 'block';
-        alert('Match scheduled!');
-        loadFixtures();
-    } catch (error) {
-        alert(error.message);
-    }
-});
+// (Match creation logic removed; now uses match-setup.html)
 
 deleteTournamentBtn.addEventListener('click', async () => {
     if (confirm('Are you sure you want to delete this tournament? This action cannot be undone!')) {
@@ -185,45 +141,7 @@ function renderTeams(teamIds) {
     });
 }
 
-function populateMatchTeams() {
-    // Populate match dropdowns with tournament teams
-    // Should use currentTournament.teams if populated
-    if (currentTournament && currentTournament.teams) {
-        const populate = (select) => {
-            select.innerHTML = '<option value="">Select Team</option>';
-            currentTournament.teams.forEach(team => {
-                const opt = document.createElement('option');
-                opt.value = team._id;
-                opt.textContent = team.name;
-                select.appendChild(opt);
-            });
-        };
-        populate(team1Select);
-        populate(team2Select);
-    } else {
-        // Fallback to all teams if needed, but tournament teams is better
-        loadAllTeamsToMatchSelects();
-    }
-}
-
-async function loadAllTeamsToMatchSelects() {
-    try {
-        const teams = await fetchAPI('/teams');
-        const populate = (select) => {
-            select.innerHTML = '<option value="">Select Team</option>';
-            teams.forEach(team => {
-                const opt = document.createElement('option');
-                opt.value = team._id;
-                opt.textContent = team.name;
-                select.appendChild(opt);
-            });
-        };
-        populate(team1Select);
-        populate(team2Select);
-    } catch (error) {
-        console.error(error);
-    }
-}
+// Used to populate internal dropdowns, no longer needed directly here since match creation moved to match-setup
 
 async function loadFixtures() {
     try {

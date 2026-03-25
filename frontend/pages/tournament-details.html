@@ -71,38 +71,7 @@
                 <button id="createMatchBtn" class="btn btn-primary">Create Match</button>
             </div>
 
-            <div id="createMatchFormContainer" class="form-container glass"
-                style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Schedule Match</h3>
-                <form id="createMatchForm">
-                    <div class="form-group">
-                        <label for="team1Select">Team 1</label>
-                        <select id="team1Select" required
-                            style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
-                            <option value="">Select Team 1</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="team2Select">Team 2</label>
-                        <select id="team2Select" required
-                            style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
-                            <option value="">Select Team 2</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="matchDate">Date</label>
-                        <input type="datetime-local" id="matchDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="venue">Venue</label>
-                        <input type="text" id="venue" required>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn btn-primary">Schedule</button>
-                        <button type="button" id="cancelMatchBtn" class="btn btn-secondary">Cancel</button>
-                    </div>
-                </form>
-            </div>
+
 
             <div id="fixturesList">
                 <!-- Matches loaded here -->
