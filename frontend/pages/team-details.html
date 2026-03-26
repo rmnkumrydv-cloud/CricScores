@@ -27,17 +27,19 @@
             <p>Loading...</p>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3>Players</h3>
-            <div>
-                <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
-                <button id="deleteTeamBtn" class="btn" style="background: var(--error-color); color: white; display: none;">Delete Team</button>
+        <div class="team-section" style="position: relative; z-index: 10;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Players</h3>
+                <div>
+                    <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
+                    <button id="deleteTeamBtn" class="btn" style="background: var(--error-color); color: white; display: none;">Delete Team</button>
+                </div>
             </div>
         </div>
 
         <!-- Add Player Form -->
         <div id="addPlayerFormContainer" class="form-container glass"
-            style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px;">
+            style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px; position: relative; z-index: 100;">
             <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Add New Player</h3>
             <form id="addPlayerForm">
                 <div class="form-group">
