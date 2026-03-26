@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CricScores - Professional Cricket Scoring</title>
     <meta name="description" content="Professional cricket scoring, tournament management, and live analytics. Join CricScores today.">
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="js/theme.js"></script>
     <style>
         /* Hero with stadium background */
         .hero {
@@ -69,7 +71,7 @@
         }
 
         .hero-title span {
-            color: var(--primary-color);
+            color: var(--primary-teal);
         }
 
         .hero-subtitle {
@@ -278,8 +280,14 @@
             <a href="index.html" class="logo">Cric<span>Scores</span></a>
             <div class="nav-links" id="navLinks">
                 <a href="index.html" class="active">Home</a>
-                <a href="pages/login.html" class="btn btn-secondary" style="border-radius: 20px; padding: 8px 25px;">Login</a>
-                <a href="pages/register.html" class="btn btn-primary" style="border-radius: 20px; padding: 8px 25px;">Sign Up</a>
+                <a href="pages/discover.html">Explore</a>
+                <button id="theme-toggle" onclick="toggleTheme()" class="btn" style="padding: 8px; background: rgba(128,128,128,0.1); border-radius: 50%; width: 40px; height: 40px;">
+                    <span id="theme-toggle-icon">🌙</span>
+                </button>
+                <div style="display: flex; gap: 10px; border-left: 1px solid var(--border-color); padding-left: 20px; margin-left: 10px;">
+                    <a href="pages/login.html" class="btn btn-secondary" style="padding: 8px 20px;">Login</a>
+                    <a href="pages/register.html" class="btn btn-primary" style="padding: 8px 20px;">Join</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -307,22 +315,22 @@
     </section>
 
     <!-- Stats Bar -->
-    <div class="hero-stats">
+    <div class="hero-stats" style="background: var(--bg-card); border-top: 1px solid var(--border-color); box-shadow: var(--nav-shadow);">
         <div class="hero-stat">
             <div class="hero-stat-value">Live</div>
-            <div class="hero-stat-label">Ball-by-Ball Scoring</div>
+            <div class="hero-stat-label" style="color: var(--text-secondary);">Ball-by-Ball</div>
         </div>
         <div class="hero-stat">
             <div class="hero-stat-value">Real-time</div>
-            <div class="hero-stat-label">Match Analytics</div>
+            <div class="hero-stat-label" style="color: var(--text-secondary);">Analytics</div>
         </div>
         <div class="hero-stat">
             <div class="hero-stat-value">Full</div>
-            <div class="hero-stat-label">Tournament Support</div>
+            <div class="hero-stat-label" style="color: var(--text-secondary);">Tournaments</div>
         </div>
         <div class="hero-stat">
-            <div class="hero-stat-value">Free</div>
-            <div class="hero-stat-label">To Join</div>
+            <div class="hero-stat-value">Join</div>
+            <div class="hero-stat-label" style="color: var(--text-secondary);">Free Forever</div>
         </div>
     </div>
 
@@ -336,35 +344,35 @@
             </div>
 
             <div class="features-grid">
-                <div class="feature-card green">
-                    <span class="feature-icon">🏏</span>
-                    <h3>Live Ball-by-Ball Scoring</h3>
-                    <p>Record every ball with Wides, No-Balls, Sixes, Fours, and wicket types. Real-time scorecard updates for every delivery of the match.</p>
+                <div class="card feature-card">
+                    <span class="feature-icon">🏟️</span>
+                    <h3>Live Ball-by-Ball</h3>
+                    <p>Record every delivery with professional precision. Wides, No-Balls, and custom dismissal types included.</p>
                 </div>
-                <div class="feature-card blue">
-                    <span class="feature-icon">📊</span>
-                    <h3>Advanced Match Analytics</h3>
-                    <p>Track Current Run Rate, Required Run Rate, Win Probability, and projected scores. Full batting and bowling scorecards after every match.</p>
+                <div class="card feature-card">
+                    <span class="feature-icon">📈</span>
+                    <h3>Real-time Analytics</h3>
+                    <p>Dynamic CRR, RRR, and Win Probability. Data-driven insights for every over.</p>
                 </div>
-                <div class="feature-card green">
+                <div class="card feature-card">
                     <span class="feature-icon">🏆</span>
-                    <h3>Tournament Management</h3>
-                    <p>Umpires can organize full tournaments, create fixtures, manage multiple teams, and track standings — all in one place.</p>
+                    <h3>Leagues & Tournaments</h3>
+                    <p>Easily organize fixtures, track standings, and manage multi-team competitions.</p>
                 </div>
-                <div class="feature-card blue">
-                    <span class="feature-icon">👤</span>
-                    <h3>Player Profiles & Stats</h3>
-                    <p>Every player gets a lifetime stats profile — runs, wickets, strike rate, economy. Build your cricketing portfolio with every match.</p>
+                <div class="card feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Instant Scorecards</h3>
+                    <p>Shareable digital scorecards generated instantly after every match completion.</p>
                 </div>
-                <div class="feature-card red">
-                    <span class="feature-icon">🔍</span>
-                    <h3>Discover Matches</h3>
-                    <p>Search for matches and tournaments by location or name. Players can find their next game and umpires can find talent from one dashboard.</p>
+                <div class="card feature-card">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>Verified Profiles</h3>
+                    <p>Build your career with verified stats that follow you across every team you join.</p>
                 </div>
-                <div class="feature-card green">
-                    <span class="feature-icon">🥇</span>
+                <div class="card feature-card">
+                    <span class="feature-icon">🌍</span>
                     <h3>Global Leaderboards</h3>
-                    <p>Top batsmen and bowlers ranked globally. Compete to be the best on the platform and showcase your talent to the world.</p>
+                    <p>Compare your performance with players worldwide. Be the best, rank as the best.</p>
                 </div>
             </div>
         </div>
@@ -374,59 +382,72 @@
     <section class="roles-section">
         <div class="container">
             <div class="section-header">
-                <div class="section-tag">Two Roles</div>
-                <h2 class="section-title">Built for Everyone</h2>
-                <p class="section-desc">Whether you're stepping onto the pitch or officiating from the boundary, CricScores has a role for you.</p>
+                <div class="section-tag">Choose Your Path</div>
+                <h2 class="section-title">One Platform, Two Perspectives</h2>
+                <p class="section-desc">Join as a player to build your legacy, or as an umpire to lead the game.</p>
             </div>
             <div class="roles-grid">
-                <div class="role-card player">
-                    <span style="font-size: 3rem;">🏏</span>
-                    <h3 style="color: var(--primary-color);">Player</h3>
-                    <p>Register your cricket identity and track your career.</p>
-                    <ul>
-                        <li>View lifetime batting & bowling statistics</li>
-                        <li>Get discovered by umpires hosting matches</li>
-                        <li>Search for matches and tournaments</li>
-                        <li>Appear on global leaderboards</li>
-                        <li>Build your professional cricket profile</li>
+                <div class="card role-card player" style="border-bottom: 4px solid var(--primary-teal); background: var(--bg-card);">
+                    <div style="font-size: 3.5rem; margin-bottom: 20px;">👤</div>
+                    <h3 style="color: var(--primary-teal);">Professional Player</h3>
+                    <p style="color: var(--text-secondary);">Register your identity, track every run, and climb the leaderboards.</p>
+                    <ul style="margin: 20px 0; text-align: left; padding-left: 20px; color: var(--text-secondary);">
+                        <li style="margin-bottom: 10px;">Detailed career statistics</li>
+                        <li style="margin-bottom: 10px;">Shareable player profile</li>
+                        <li style="margin-bottom: 10px;">Discover local matches</li>
                     </ul>
-                    <a href="pages/register.html" class="btn btn-primary" style="width: 100%; text-align: center; padding: 14px; border-radius: 12px;">Join as Player</a>
+                    <a href="pages/register.html" class="btn btn-primary" style="width: 100%;">Join as Player</a>
                 </div>
-                <div class="role-card umpire">
-                    <span style="font-size: 3rem;">🎯</span>
-                    <h3 style="color: var(--secondary-color);">Umpire</h3>
-                    <p>Host and manage matches with complete officiating tools.</p>
-                    <ul>
-                        <li>Create and manage teams & tournaments</li>
-                        <li>Start matches and score ball-by-ball</li>
-                        <li>Select players from verified profiles</li>
-                        <li>Declare winners and award Player of the Match</li>
-                        <li>Track your officiating career stats</li>
+                <div class="card role-card umpire" style="border-bottom: 4px solid #00d4ff; background: var(--bg-card);">
+                    <div style="font-size: 3.5rem; margin-bottom: 20px;">🎯</div>
+                    <h3 style="color: #00d4ff;">Expert Umpire</h3>
+                    <p style="color: var(--text-secondary);">Organize matches, score ball-by-ball, and manage your local leagues.</p>
+                    <ul style="margin: 20px 0; text-align: left; padding-left: 20px; color: var(--text-secondary);">
+                        <li style="margin-bottom: 10px;">Ball-by-ball scoring engine</li>
+                        <li style="margin-bottom: 10px;">Tournament management tools</li>
+                        <li style="margin-bottom: 10px;">Player discovery & matching</li>
                     </ul>
-                    <a href="pages/register.html" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 14px; border-radius: 12px; background: rgba(0,212,255,0.1);">Join as Umpire</a>
+                    <a href="pages/register.html" class="btn btn-secondary" style="width: 100%; border-color: #00d4ff; color: #00d4ff;">Join as Umpire</a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section">
+    <section class="cta-section" style="background: var(--bg-main); border-top: 1px solid var(--border-color);">
         <div class="container">
-            <div class="cta-box">
-                <h2>Ready to Play?</h2>
-                <p>Join thousands of cricketers already scoring their legacy on CricScores. It's free to join.</p>
+            <div class="cta-box card" style="background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 208, 132, 0.05) 100%);">
+                <h2 style="font-size: 3rem; margin-bottom: 20px;">Take Your Game to the Next Level</h2>
+                <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px;">Join thousands of players and umpires building the future of digital cricket. Fast, free, and built for the pros.</p>
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="pages/register.html" class="btn btn-primary" style="padding: 15px 40px; border-radius: 14px; font-size: 1rem; font-weight: 800;">Create Free Account</a>
-                    <a href="pages/login.html" class="btn btn-secondary" style="padding: 15px 40px; border-radius: 14px; font-size: 1rem;">Already have an account?</a>
+                    <a href="pages/register.html" class="btn btn-primary" style="padding: 16px 40px;">Create Free Account</a>
+                    <a href="pages/login.html" class="btn btn-secondary" style="padding: 16px 40px;">Sign In Locally</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer>
+    <footer style="background: var(--bg-main); padding: 80px 0 40px; border-top: 1px solid var(--border-color);">
         <div class="container">
-            <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">Cric<span style="color: var(--primary-color);">Scores</span></p>
-            <p>© 2026 CricScores. Built for the love of cricket.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 60px; text-align: left;">
+                <div>
+                    <a href="index.html" class="logo" style="display: block; margin-bottom: 20px;">Cric<span>Scores</span></a>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Modern cricket scoring for the next generation of players and officials.</p>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 20px;">Platform</h4>
+                    <a href="pages/discover.html" style="display: block; margin-bottom: 12px; color: var(--text-secondary);">Explore Matches</a>
+                    <a href="pages/leaderboards.html" style="display: block; margin-bottom: 12px; color: var(--text-secondary);">Leaderboards</a>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 20px;">Account</h4>
+                    <a href="pages/register.html" style="display: block; margin-bottom: 12px; color: var(--text-secondary);">Get Started</a>
+                    <a href="pages/login.html" style="display: block; margin-bottom: 12px; color: var(--text-secondary);">Login</a>
+                </div>
+            </div>
+            <div style="padding-top: 40px; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.85rem;">
+                © 2026 CricScores Platform. All rights reserved.
+            </div>
         </div>
     </footer>
 
