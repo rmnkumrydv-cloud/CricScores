@@ -192,7 +192,7 @@
             line-height: 1.7;
             position: relative;
             z-index: 2;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
 
         .feature-bg {
@@ -207,31 +207,31 @@
         }
 
         .feature-card:hover .feature-bg {
-            opacity: 0.85;
-            filter: grayscale(0) blur(0) brightness(1.2) contrast(1.1) saturate(1.2);
+            opacity: 0.6;
+            filter: grayscale(0) blur(0) brightness(1.05) contrast(1.05) saturate(1.1);
             transform: scale(1.03);
         }
 
         .feature-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(8, 12, 20, 0.95) 0%, rgba(8, 12, 20, 0.7) 100%);
+            background: linear-gradient(135deg, rgba(8, 12, 20, 0.9) 0%, rgba(8, 12, 20, 0.7) 100%);
             transition: var(--transition);
             z-index: 1;
         }
 
         .feature-card:hover .feature-overlay {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%);
         }
 
-        .feature-card.green:hover { box-shadow: 0 0 40px rgba(0, 255, 136, 0.25); border-color: var(--primary-color); }
-        .feature-card.blue:hover { box-shadow: 0 0 40px rgba(0, 212, 255, 0.25); border-color: var(--secondary-color); }
-        .feature-card.red:hover { box-shadow: 0 0 40px rgba(255, 77, 77, 0.25); border-color: var(--accent-red); }
+        .feature-card.green:hover { box-shadow: 0 0 25px rgba(0, 255, 136, 0.15); border-color: var(--primary-color); }
+        .feature-card.blue:hover { box-shadow: 0 0 25px rgba(0, 212, 255, 0.15); border-color: var(--secondary-color); }
+        .feature-card.red:hover { box-shadow: 0 0 25px rgba(255, 77, 77, 0.15); border-color: var(--accent-red); }
 
         .feature-card h3 {
             position: relative;
             z-index: 2;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 1);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
         }
 
         .feature-icon {
