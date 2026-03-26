@@ -192,7 +192,7 @@
             line-height: 1.7;
             position: relative;
             z-index: 2;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .feature-bg {
@@ -207,9 +207,9 @@
         }
 
         .feature-card:hover .feature-bg {
-            opacity: 0.6;
-            filter: grayscale(0) blur(0) brightness(1.05) contrast(1.05) saturate(1.1);
-            transform: scale(1.03);
+            opacity: 0.5;
+            filter: grayscale(0) blur(0) brightness(1.02) contrast(1.02) saturate(1.1);
+            transform: scale(1.02);
         }
 
         .feature-overlay {
@@ -224,14 +224,16 @@
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%);
         }
 
-        .feature-card.green:hover { box-shadow: 0 0 25px rgba(0, 255, 136, 0.15); border-color: var(--primary-color); }
-        .feature-card.blue:hover { box-shadow: 0 0 25px rgba(0, 212, 255, 0.15); border-color: var(--secondary-color); }
-        .feature-card.red:hover { box-shadow: 0 0 25px rgba(255, 77, 77, 0.15); border-color: var(--accent-red); }
+        .feature-card:hover { 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
 
         .feature-card h3 {
             position: relative;
             z-index: 2;
-            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
         }
 
         .feature-icon {
@@ -398,7 +400,7 @@
                     <p>Track Current Run Rate, Required Run Rate, Win Probability, and projected scores. Full batting and bowling scorecards after every match.</p>
                 </div>
                 <div class="feature-card green">
-                    <div class="feature-bg" style="background-image: url('images/feature_tournament.png');"></div>
+                    <div class="feature-bg" style="background-image: url('images/feature_discovery.png');"></div>
                     <div class="feature-overlay"></div>
                     <span class="feature-icon">🏆</span>
                     <h3>Tournament Management</h3>
@@ -412,14 +414,14 @@
                     <p>Every player gets a lifetime stats profile — runs, wickets, strike rate, economy. Build your cricketing portfolio with every match.</p>
                 </div>
                 <div class="feature-card red">
-                    <div class="feature-bg" style="background-image: url('images/feature_discovery.png');"></div>
+                    <div class="feature-bg" style="background-image: url('images/feature_analytics.png');"></div>
                     <div class="feature-overlay"></div>
                     <span class="feature-icon">🔍</span>
                     <h3>Discover Matches</h3>
                     <p>Search for matches and tournaments by location or name. Players can find their next game and umpires can find talent from one dashboard.</p>
                 </div>
                 <div class="feature-card green">
-                    <div class="feature-bg" style="background-image: url('images/feature_leaderboards.png');"></div>
+                    <div class="feature-bg" style="background-image: url('images/feature_tournament.png');"></div>
                     <div class="feature-overlay"></div>
                     <span class="feature-icon">🥇</span>
                     <h3>Global Leaderboards</h3>
