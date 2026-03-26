@@ -187,11 +187,12 @@
         }
 
         .feature-card p {
-            color: var(--text-secondary);
+            color: #ffffff;
             font-size: 0.95rem;
             line-height: 1.7;
             position: relative;
             z-index: 2;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
         }
 
         .feature-bg {
@@ -199,35 +200,41 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            opacity: 0.15;
-            filter: grayscale(0.5) blur(2px);
+            opacity: 0.2;
+            filter: grayscale(0.4) blur(1px);
             transition: var(--transition);
             z-index: 0;
         }
 
         .feature-card:hover .feature-bg {
-            opacity: 0.8;
-            filter: grayscale(0) blur(0) brightness(1.2) contrast(1.1);
-            transform: scale(1.05);
+            opacity: 0.85;
+            filter: grayscale(0) blur(0) brightness(1.2) contrast(1.1) saturate(1.2);
+            transform: scale(1.03);
         }
 
         .feature-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(8, 12, 20, 0.9) 0%, rgba(8, 12, 20, 0.6) 100%);
+            background: linear-gradient(135deg, rgba(8, 12, 20, 0.95) 0%, rgba(8, 12, 20, 0.7) 100%);
             transition: var(--transition);
             z-index: 1;
         }
 
         .feature-card:hover .feature-overlay {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 100%);
         }
 
-        .feature-card.green:hover { box-shadow: 0 0 40px rgba(0, 255, 136, 0.2); border-color: var(--primary-color); }
-        .feature-card.blue:hover { box-shadow: 0 0 40px rgba(0, 212, 255, 0.2); border-color: var(--secondary-color); }
-        .feature-card.red:hover { box-shadow: 0 0 40px rgba(255, 77, 77, 0.2); border-color: var(--accent-red); }
+        .feature-card.green:hover { box-shadow: 0 0 40px rgba(0, 255, 136, 0.25); border-color: var(--primary-color); }
+        .feature-card.blue:hover { box-shadow: 0 0 40px rgba(0, 212, 255, 0.25); border-color: var(--secondary-color); }
+        .feature-card.red:hover { box-shadow: 0 0 40px rgba(255, 77, 77, 0.25); border-color: var(--accent-red); }
 
-        .feature-card h3, .feature-icon {
+        .feature-card h3 {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 1);
+        }
+
+        .feature-icon {
             position: relative;
             z-index: 2;
         }
