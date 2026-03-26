@@ -7,6 +7,16 @@ const addPlayerBtn = document.getElementById('addPlayerBtn');
 const addPlayerFormContainer = document.getElementById('addPlayerFormContainer');
 const addPlayerForm = document.getElementById('addPlayerForm');
 const cancelPlayerBtn = document.getElementById('cancelPlayerBtn');
+const playerSearch = document.getElementById('playerSearch');
+const searchResults = document.getElementById('searchResults');
+const selectedPlayerProfile = document.getElementById('selectedPlayerProfile');
+const selectedPlayerName = document.getElementById('selectedPlayerName');
+const selectedPlayerUsername = document.getElementById('selectedPlayerUsername');
+const viewStatsLink = document.getElementById('viewStatsLink');
+
+let allPlayers = [];
+let selectedPlayerId = null;
+let teamPlayersIds = [];
 
 if (!teamId) {
     alert('No team specified');
@@ -16,37 +26,77 @@ if (!teamId) {
 // Load team details on startup
 document.addEventListener('DOMContentLoaded', () => {
     loadTeamDetails();
-    loadAvailablePlayers();
+    initPlayerSearch();
 });
 
-async function loadAvailablePlayers() {
+async function initPlayerSearch() {
     try {
-        const players = await fetchAPI('/users/players');
-        const playerSelect = document.getElementById('playerSelect');
-        playerSelect.innerHTML = '<option value="">-- Select a Player --</option>';
+        allPlayers = await fetchAPI('/users/players');
         
-        players.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p._id; // userId
-            opt.textContent = `${p.name || 'Unknown'} (@${p.username || 'n/a'})`;
-            playerSelect.appendChild(opt);
+        playerSearch.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            searchResults.innerHTML = '';
+            
+            if (term.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            const filtered = allPlayers.filter(p => 
+                !teamPlayersIds.includes(p._id) && 
+                ((p.name || '').toLowerCase().includes(term) || (p.username || '').toLowerCase().includes(term))
+            ).slice(0, 10);
+
+            if (filtered.length > 0) {
+                searchResults.style.display = 'block';
+                filtered.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'player-item';
+                    div.style.cursor = 'pointer';
+                    div.style.padding = '12px';
+                    div.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    div.innerHTML = `
+                        <div style="font-weight: 600;">${p.name}</div>
+                        <div style="font-size: 0.8em; color: var(--text-secondary);">@${p.username}</div>
+                    `;
+                    div.onclick = () => selectPlayer(p);
+                    searchResults.appendChild(div);
+                });
+            } else {
+                searchResults.style.display = 'none';
+            }
         });
+
+        // Close search on blur
+        document.addEventListener('click', (e) => {
+            if (!playerSearch.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
     } catch (error) {
-        console.error('Error loading players:', error);
-        document.getElementById('playerSelect').innerHTML = '<option value="">Error loading players</option>';
+        console.error('Error fetching players:', error);
     }
 }
 
-document.getElementById('playerSelect').addEventListener('change', (e) => {
-    const userId = e.target.value;
-    const viewStatsLink = document.getElementById('viewStatsLink');
-    if (userId) {
-        viewStatsLink.href = `player-view.html?id=${userId}`;
-        viewStatsLink.style.display = 'inline-block';
-    } else {
-        viewStatsLink.style.display = 'none';
-    }
-});
+function selectPlayer(p) {
+    selectedPlayerId = p._id;
+    playerSearch.value = '';
+    searchResults.style.display = 'none';
+    
+    selectedPlayerName.textContent = p.name;
+    selectedPlayerUsername.textContent = `@${p.username}`;
+    viewStatsLink.href = `player-view.html?id=${p._id}`;
+    
+    selectedPlayerProfile.style.display = 'flex';
+}
+
+function resetSearch() {
+    selectedPlayerId = null;
+    playerSearch.value = '';
+    selectedPlayerProfile.style.display = 'none';
+    searchResults.style.display = 'none';
+}
 
 addPlayerBtn.addEventListener('click', () => {
     addPlayerFormContainer.style.display = 'block';
@@ -60,10 +110,10 @@ cancelPlayerBtn.addEventListener('click', () => {
 
 addPlayerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const userId = document.getElementById('playerSelect').value;
+    const userId = selectedPlayerId;
 
     if (!userId) {
-        alert('Please select a player');
+        alert('Please search and select a player first');
         return;
     }
 
@@ -75,6 +125,7 @@ addPlayerForm.addEventListener('submit', async (e) => {
 
         // Reset form and reload
         addPlayerForm.reset();
+        resetSearch();
         addPlayerFormContainer.style.display = 'none';
         addPlayerBtn.style.display = 'block';
         loadTeamDetails();
@@ -110,9 +161,11 @@ async function loadTeamDetails() {
         `;
 
         playersList.innerHTML = '';
+        teamPlayersIds = []; // Reset team members tracking
 
         if (team.players && team.players.length > 0) {
             team.players.forEach(player => {
+                teamPlayersIds.push(player._id); // Tracking current members
                 const item = document.createElement('div');
                 item.className = 'player-card glass';
                 item.style.marginBottom = '10px';
