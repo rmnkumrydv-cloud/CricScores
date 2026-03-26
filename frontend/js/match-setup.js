@@ -11,18 +11,23 @@ const startBtn = document.getElementById('startSetupBtn');
 
 let teams = [];
 let tournaments = [];
+let allVerifiedPlayers = []; // For global search
+let team1PlayersData = []; // Local team players
+let team2PlayersData = []; 
 let selectedPlayers1 = [];
 let selectedPlayers2 = [];
 
 async function init() {
     try {
-        const [teamsData, tournamentsData] = await Promise.all([
+        const [teamsData, tournamentsData, playersData] = await Promise.all([
             fetchAPI('/teams'),
-            fetchAPI('/tournaments')
+            fetchAPI('/tournaments'),
+            fetchAPI('/users/players')
         ]);
 
         teams = teamsData;
         tournaments = tournamentsData;
+        allVerifiedPlayers = playersData;
 
         tournaments.forEach(t => {
             const opt = document.createElement('option');
@@ -53,6 +58,10 @@ async function init() {
         team1Select.addEventListener('change', (e) => loadPlayers(e.target.value, 1));
         team2Select.addEventListener('change', (e) => loadPlayers(e.target.value, 2));
 
+        // Setup Search Listeners
+        setupSearch(1);
+        setupSearch(2);
+
         startBtn.addEventListener('click', handleProceed);
     } catch (error) {
         console.error('Error loading data', error);
@@ -68,26 +77,12 @@ async function loadPlayers(teamId, teamNum) {
         const selectedTeam = teams.find(t => t._id === teamId);
 
         // If team object doesn't have players, we might need an API call
-        // Assuming team.players is populated or we fetch from /players?teamId=...
         const players = await fetchAPI(`/teams/${teamId}/players`);
+        
+        if (teamNum === 1) team1PlayersData = players;
+        else team2PlayersData = players;
 
-        const container = teamNum === 1 ? team1PlayersEl : team2PlayersEl;
-        container.innerHTML = '';
-
-        players.forEach(player => {
-            const item = document.createElement('div');
-            item.className = 'player-item';
-            item.innerHTML = `
-                <input type="checkbox" value="${player._id}" data-name="${player.name}">
-                <label>${player.name} (${player.role})</label>
-            `;
-
-            const checkbox = item.querySelector('input');
-            checkbox.addEventListener('change', (e) => updateSelection(e, teamNum));
-
-            container.appendChild(item);
-        });
-
+        renderPlayerList(teamNum);
         updateCounter(teamNum);
 
         // Show Select All link
@@ -95,6 +90,118 @@ async function loadPlayers(teamId, teamNum) {
     } catch (error) {
         console.error('Error loading players', error);
     }
+}
+
+function renderPlayerList(teamNum, filterTerm = '') {
+    const players = teamNum === 1 ? team1PlayersData : team2PlayersData;
+    const container = teamNum === 1 ? team1PlayersEl : team2PlayersEl;
+    const selectedIds = teamNum === 1 ? selectedPlayers1 : selectedPlayers2;
+    
+    container.innerHTML = '';
+    
+    const term = filterTerm.toLowerCase();
+    const filtered = players.filter(p => 
+        (p.name || '').toLowerCase().includes(term) || 
+        (p.username || '').toLowerCase().includes(term)
+    );
+
+    if (filtered.length === 0 && players.length > 0) {
+        container.innerHTML = '<p style="text-align: center; color: #555; margin-top: 20px;">No matching players in team</p>';
+    }
+
+    filtered.forEach(player => {
+        const item = document.createElement('div');
+        item.className = 'player-item';
+        const isChecked = selectedIds.includes(player._id);
+        
+        item.innerHTML = `
+            <input type="checkbox" value="${player._id}" ${isChecked ? 'checked' : ''}>
+            <label>${player.name} (${player.role || 'Player'})</label>
+        `;
+
+        const checkbox = item.querySelector('input');
+        checkbox.addEventListener('change', (e) => updateSelection(e, teamNum));
+
+        container.appendChild(item);
+    });
+}
+
+function setupSearch(teamNum) {
+    const searchInput = document.getElementById(`team${teamNum}Search`);
+    const resultsContainer = document.getElementById(`team${teamNum}GlobalResults`);
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        
+        // 1. Filter current list
+        renderPlayerList(teamNum, term);
+
+        // 2. Global search if term > 1
+        resultsContainer.innerHTML = '';
+        if (term.length < 2) {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        const teamPlayers = teamNum === 1 ? team1PlayersData : team2PlayersData;
+        const teamPlayerIds = teamPlayers.map(p => p._id);
+        
+        const globalMatches = allVerifiedPlayers.filter(p => 
+            !teamPlayerIds.includes(p._id) && 
+            ((p.name || '').toLowerCase().includes(term) || (p.username || '').toLowerCase().includes(term))
+        ).slice(0, 5);
+
+        if (globalMatches.length > 0) {
+            resultsContainer.style.display = 'block';
+            const header = document.createElement('div');
+            header.style.padding = '5px 10px';
+            header.style.fontSize = '0.7em';
+            header.style.color = 'var(--primary-color)';
+            header.style.background = 'rgba(0,0,0,0.5)';
+            header.textContent = 'GLOBAL PLAYERS (Click to add)';
+            resultsContainer.appendChild(header);
+
+            globalMatches.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'player-item';
+                div.style.cursor = 'pointer';
+                div.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                div.innerHTML = `<strong>${p.name}</strong> (@${p.username})`;
+                div.onclick = () => {
+                    addGlobalPlayer(teamNum, p);
+                    searchInput.value = '';
+                    resultsContainer.style.display = 'none';
+                    renderPlayerList(teamNum);
+                };
+                resultsContainer.appendChild(div);
+            });
+        } else {
+            resultsContainer.style.display = 'none';
+        }
+    });
+
+    // Close results on blur
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+            resultsContainer.style.display = 'none';
+        }
+    });
+}
+
+function addGlobalPlayer(teamNum, player) {
+    const teamData = teamNum === 1 ? team1PlayersData : team2PlayersData;
+    const selectedIds = teamNum === 1 ? selectedPlayers1 : selectedPlayers2;
+
+    if (!teamData.find(p => p._id === player._id)) {
+        teamData.push(player);
+    }
+    
+    if (!selectedIds.includes(player._id)) {
+        selectedIds.push(player._id);
+    }
+
+    updateCounter(teamNum);
+    checkValidity();
 }
 
 function updateSelection(e, teamNum) {
@@ -123,15 +230,18 @@ function checkValidity() {
 }
 
 function toggleAll(teamNum) {
+    const players = teamNum === 1 ? team1PlayersData : team2PlayersData;
+    const selectedIds = teamNum === 1 ? selectedPlayers1 : selectedPlayers2;
     const container = teamNum === 1 ? team1PlayersEl : team2PlayersEl;
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-    const link = document.getElementById(`team${teamNum}SelectAll`);
+    
+    if (checkboxes.length === 0) return;
 
-    // Determine if we should select all or none
-    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    // Determine if we should select all or none of the VISIBLE ones
+    const allVisibleChecked = Array.from(checkboxes).every(cb => cb.checked);
 
     checkboxes.forEach(cb => {
-        cb.checked = !allChecked;
+        cb.checked = !allVisibleChecked;
         const id = cb.value;
         if (teamNum === 1) {
             if (cb.checked) {
@@ -148,7 +258,8 @@ function toggleAll(teamNum) {
         }
     });
 
-    link.textContent = allChecked ? 'Select All' : 'Deselect All';
+    const link = document.getElementById(`team${teamNum}SelectAll`);
+    link.textContent = allVisibleChecked ? 'Select All' : 'Deselect All';
     updateCounter(teamNum);
     checkValidity();
 }

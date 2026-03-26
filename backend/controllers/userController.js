@@ -126,6 +126,7 @@ const getMe = async (req, res, next) => {
 const getPlayers = async (req, res, next) => {
     try {
         const players = await User.find({ role: 'player', isVerified: true }).select('-password');
+        console.log(`[${new Date().toISOString()}] getPlayers returned ${players.length} verified players.`);
         res.status(200).json(players);
     } catch (error) {
         next(error);
@@ -149,42 +150,52 @@ const getUmpires = async (req, res, next) => {
 // @access  Private
 const updateUserProfile = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
+        const userId = req.user.id;
+        const updateData = {
+            name: req.body.name,
+            age: req.body.age,
+            profilePic: req.body.profilePic,
+            playerRole: req.body.playerRole,
+            battingStyle: req.body.battingStyle,
+            bowlingStyle: req.body.bowlingStyle
+        };
+
+        if (req.body.isVerified !== undefined) {
+            updateData.isVerified = req.body.isVerified === true;
+        }
+
+        // Remove undefined fields so they don't overwrite with null
+        Object.keys(updateData).forEach(key => {
+            if (updateData[key] === undefined) delete updateData[key];
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!updatedUser) {
             res.status(404);
             throw new Error('User not found');
         }
 
-        user.name = req.body.name || user.name;
-        user.age = req.body.age !== undefined ? req.body.age : user.age;
-        user.isVerified = req.body.isVerified !== undefined ? req.body.isVerified : user.isVerified;
-        if (req.body.profilePic) {
-            user.profilePic = req.body.profilePic;
-        }
-
-        if (user.role === 'player') {
-            user.playerRole = req.body.playerRole || user.playerRole;
-            user.battingStyle = req.body.battingStyle || user.battingStyle;
-            user.bowlingStyle = req.body.bowlingStyle || user.bowlingStyle;
-        }
-
-        const updatedUser = await user.save();
-        
         res.status(200).json({
-            _id: updatedUser.id,
+            _id: updatedUser._id,
             name: updatedUser.name,
             username: updatedUser.username,
             email: updatedUser.email,
             role: updatedUser.role,
             age: updatedUser.age,
-            isVerified: updatedUser.isVerified,
+            isVerified: updatedUser.isVerified === true,
             profilePic: updatedUser.profilePic,
             playerRole: updatedUser.playerRole,
             battingStyle: updatedUser.battingStyle,
             bowlingStyle: updatedUser.bowlingStyle,
-            token: generateToken(updatedUser.id)
+            token: generateToken(updatedUser._id)
         });
     } catch (error) {
+        console.error('Update Profile Error:', error);
         next(error);
     }
 };

@@ -28,7 +28,7 @@ async function loadAvailablePlayers() {
         players.forEach(p => {
             const opt = document.createElement('option');
             opt.value = p._id; // userId
-            opt.textContent = `${p.name} (@${p.username})`;
+            opt.textContent = `${p.name || 'Unknown'} (@${p.username || 'n/a'})`;
             playerSelect.appendChild(opt);
         });
     } catch (error) {

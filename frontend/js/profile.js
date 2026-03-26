@@ -18,12 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Merge fresh server data into localStorage (keep token from cached)
             const merged = {
-                ...cachedUser,
-                ...freshUser,
-                token: cachedUser.token  // keep token since /users/me doesn't return one
+                ...(JSON.parse(localStorage.getItem('user')) || {}),
+                ...freshUser
             };
-            localStorage.setItem('user', JSON.stringify(merged));
+            if (cachedUser && cachedUser.token) merged.token = cachedUser.token;
+            
+            saveUser(merged);
             cachedUser = merged;
+            console.log('Profile Init (Fresh):', merged.isVerified);
 
             // Set avatar
             const pic = merged.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(merged.name || 'User')}&background=random`;
@@ -117,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const stored = JSON.parse(localStorage.getItem('user'));
         const userRole = stored ? stored.role : 'player';
 
+        const name = document.getElementById('name').value;
         if (!name || name.trim() === '') {
             alert('Please provide your name before verifying.');
             return;
@@ -146,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             saveUser(updatedUser);
-            cachedUser = { ...updatedUser, token: updatedUser.token || stored.token };
+            cachedUser = JSON.parse(localStorage.getItem('user'));
             updateVerificationUI(cachedUser);
             applyViewMode(cachedUser);
 
@@ -203,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             saveUser(updatedUser);
-            cachedUser = { ...updatedUser, token: updatedUser.token || (stored && stored.token) };
+            cachedUser = JSON.parse(localStorage.getItem('user'));
             updateVerificationUI(cachedUser);
 
             if (updatedUser.isVerified) {

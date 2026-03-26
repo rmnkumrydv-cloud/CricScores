@@ -34,7 +34,14 @@ if (playerSearch) {
         searchResults.innerHTML = '';
         if (!term) return;
 
-        const filtered = allPlayers.filter(p => !selectedPlayers.find(sp => sp._id === p._id) && (p.name.toLowerCase().includes(term) || p.username.toLowerCase().includes(term)));
+        const filtered = allPlayers.filter(p => {
+            const isAlreadySelected = selectedPlayers.find(sp => sp._id === p._id);
+            if (isAlreadySelected) return false;
+
+            const nameMatch = (p.name || '').toLowerCase().includes(term);
+            const usernameMatch = (p.username || '').toLowerCase().includes(term);
+            return nameMatch || usernameMatch;
+        });
         
         filtered.slice(0, 5).forEach(p => {
             const div = document.createElement('div');
