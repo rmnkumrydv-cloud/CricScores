@@ -5,126 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discover - CricScores</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --transition-speed: 0.3s;
-        }
-
         .search-container {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
         }
-
         .search-input {
             flex: 1;
+            min-width: 300px;
             position: relative;
         }
-
         .search-input input {
             width: 100%;
             padding: 15px 20px 15px 50px;
-            border-radius: 12px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: #fff;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
             font-size: 1rem;
-            transition: border-color var(--transition-speed);
+            transition: all 0.3s ease;
         }
-
-        .search-input input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .search-icon {
+        .search-input i {
             position: absolute;
             left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            opacity: 0.6;
-            pointer-events: none;
+            color: var(--text-secondary);
         }
-
         .filter-tabs {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 30px;
-            overflow-x: auto;
-            padding-bottom: 5px;
         }
-
         .filter-tab {
-            padding: 10px 24px;
-            border-radius: 25px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-secondary);
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            white-space: nowrap;
-            font-weight: 500;
-            transition: all var(--transition-speed) ease;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
         }
-
-        .filter-tab:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
         .filter-tab.active {
             background: var(--primary-color);
-            color: #000; /* High contrast if primary is bright */
-            border-color: var(--primary-color);
-            font-weight: 700;
+            color: white;
         }
-
         .discover-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
         }
-
-        /* Improved Card Design */
         .match-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
-            transition: transform var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.3s ease;
         }
-
         .match-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-5px);
         }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            opacity: 0.7;
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
-
-        /* Loading Animation */
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--glass-border);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 40px auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        .status-live { background: rgba(255, 77, 77, 0.2); color: #ff4d4d; }
+        .status-scheduled { background: rgba(255, 171, 0, 0.2); color: #ffab00; }
+        .status-completed { background: rgba(0, 200, 83, 0.2); color: #00c853; }
     </style>
 </head>
 <body class="dark-mode">
@@ -134,60 +82,39 @@
             <div class="nav-links">
                 <a href="../dashboard.html">Dashboard</a>
                 <a href="leaderboard.html">Leaderboard</a>
-                <button class="user-profile-btn" onclick="location.href='profile.html'">
-                    <img id="navProfilePic" src="https://ui-avatars.com/api/?name=User&background=random" alt="">
+                <div class="user-profile" onclick="window.location.href='profile.html'">
+                    <img id="navProfilePic" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile">
                     <span id="navUserName">Loading...</span>
-                </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container animate-fade" style="margin-top: 40px;">
-        <header style="display: flex; align-items: center; gap: 20px; margin-bottom: 40px;">
-            <a href="../dashboard.html" class="btn-icon" aria-label="Go back">
-                <span style="font-size: 1.5rem;">←</span>
-            </a>
-            <h1 style="font-weight: 800; font-size: clamp(1.8rem, 5vw, 2.8rem); margin: 0; letter-spacing: -1.5px;">
-                Explore <span style="color: var(--primary-color);">Cricket</span>
-            </h1>
-        </header>
+    <div class="container animate-fade" style="margin-top: 40px;">
+        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+            <a href="../dashboard.html" class="btn-icon" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 50%; min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;">←</a>
+            <h1 style="font-weight: 900; font-size: 2.8rem; margin: 0; letter-spacing: -2px; color: var(--primary-color);">Explore <span>Cricket</span></h1>
+        </div>
 
-        <section class="search-section">
-            <div class="search-container">
-                <div class="search-input">
-                    <span class="search-icon" aria-hidden="true">🔍</span>
-                    <input type="text" id="searchInput" placeholder="Search venues, teams, or tournaments..." aria-label="Search cricket matches">
-                </div>
+        <div class="search-container">
+            <div class="search-input">
+                <i style="font-style: normal; font-size: 1.2rem;">🔍</i>
+                <input type="text" id="searchInput" placeholder="Search by venue or tournament name...">
             </div>
+        </div>
 
-            <nav class="filter-tabs" role="tablist">
-                <button class="filter-tab active" role="tab" aria-selected="true" onclick="setFilter('matches', this)">Matches</button>
-                <button class="filter-tab" role="tab" aria-selected="false" onclick="setFilter('tournaments', this)">Tournaments</button>
-            </nav>
-        </section>
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="setFilter('matches')">Matches</div>
+            <div class="filter-tab" onclick="setFilter('tournaments')">Tournaments</div>
+        </div>
 
         <div id="resultsGrid" class="discover-grid">
+            <!-- Results will be loaded here -->
             <div class="loading-spinner"></div>
         </div>
-    </main>
+    </div>
 
     <script src="../js/api.js"></script>
     <script src="../js/discover.js"></script>
-    <script>
-        // Quick helper for tab UI switching
-        function setFilter(type, element) {
-            document.querySelectorAll('.filter-tab').forEach(t => {
-                t.classList.remove('active');
-                t.setAttribute('aria-selected', 'false');
-            });
-            element.classList.add('active');
-            element.setAttribute('aria-selected', 'true');
-            
-            // Call the actual logic from discover.js
-            if (typeof window.handleFilterChange === 'function') {
-                window.handleFilterChange(type);
-            }
-        }
-    </script>
 </body>
 </html>
