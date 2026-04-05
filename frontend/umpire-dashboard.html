@@ -1,217 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Umpire Dashboard - CricScores</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        /* Umpire Specific Styling */
-        .ump-badge {
-            font-size: 0.55em;
-            color: var(--primary-color);
-            border: 1.5px solid var(--primary-color);
-            padding: 2px 10px;
-            border-radius: 20px;
-            vertical-align: middle;
-            margin-left: 8px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .action-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            margin-top: 50px;
-        }
-
-        .status-tag {
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .btn-full {
-            width: 100%;
-            text-align: center;
-            margin-top: auto;
-            padding: 12px;
-        }
-        
-        .error-placeholder {
-            text-align: center;
-            padding: 40px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 15px;
-            border: 1px dashed rgba(255,255,255,0.1);
-            color: #666;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umpire Dashboard - CricScores</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="dark-mode">
-    <nav class="navbar">
-        <div class="nav-content container">
-            <a href="index.html" class="logo">Cric<span>Scores</span> <span class="ump-badge">UMP</span></a>
-            <div class="nav-links">
-                <a href="umpire-dashboard.html" class="active">Umpire Panel</a>
-                <a href="pages/leaderboards.html">Leaderboard</a>
-                <button class="user-profile-btn" onclick="location.href='pages/profile.html'">
-                    <img id="navProfilePic" src="" alt="">
-                    <span id="navUserName">Loading...</span>
-                </button>
-            </div>
-        </div>
-    </nav>
+<body>
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="index.html" class="logo">Cric<span>Scores</span> <span style="font-size: 0.5em; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 2px 8px; border-radius: 20px; vertical-align: middle; margin-left: 10px; font-weight: 800;">UMP</span></a>
+            <div class="nav-links">
+                <a href="umpire-dashboard.html" class="active">Umpire Panel</a>
+                <a href="pages/leaderboards.html">Leaderboard</a>
+                <div class="user-profile" onclick="window.location.href='pages/profile.html'">
+                    <img id="navProfilePic" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile">
+                    <span id="navUserName">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <main class="container animate-fade" style="margin-top: 40px;">
-        <header>
-            <h1 style="font-weight: 800; font-size: clamp(1.8rem, 5vw, 2.5rem); margin-bottom: 10px; letter-spacing: -1.5px;">Umpire Dashboard</h1>
-            <p style="color: var(--text-secondary); margin-bottom: 35px;">Welcome back, Official. Manage your matches and tournaments below.</p>
-        </header>
+    <div class="container animate-fade" style="margin-top: 40px;">
+        <h2 style="font-weight: 800; font-size: 2.2rem; margin-bottom: 30px; letter-spacing: -1px;">Umpire Dashboard</h2>
 
-        <aside id="verifyBanner" class="card glass" style="display: none; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; margin-bottom: 35px; flex-direction: row; align-items: center; justify-content: space-between; padding: 20px;">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span style="font-size: 1.8rem;">🛡️</span>
-                <div>
-                    <h4 style="margin: 0; color: #ff4d4d;">Identity Not Verified</h4>
-                    <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-secondary);">Umpires must be verified to host official tournaments.</p>
-                </div>
-            </div>
-            <a href="pages/profile.html" class="btn btn-primary" style="background: #ff4d4d; border: none; font-size: 0.9rem;">Complete Profile</a>
-        </aside>
+        <!-- Profile Completion Banner -->
+        <div id="verifyBanner" class="card glass" style="display: none; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; margin-bottom: 30px; flex-direction: row; align-items: center; justify-content: space-between; padding: 15px 25px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="font-size: 1.5rem;">⚠️</span>
+                <div>
+                    <h4 style="margin: 0; color: #ff4d4d;">Profile Incomplete</h4>
+                    <p style="margin: 0; font-size: 0.85em; color: var(--text-secondary);">Your profile is not verified. Please complete and verify your profile to gain full access.</p>
+                </div>
+            </div>
+            <a href="pages/profile.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85em; background: #ff4d4d; border-color: #ff4d4d; color: white;">Verify Now</a>
+        </div>
 
-        <section class="dashboard-grid">
-            <div class="card glass action-card" style="border-top: 4px solid var(--primary-color);">
-                <div>
-                    <h3 style="color: var(--primary-color);">Start a Match</h3>
-                    <p>Setup a custom match between two teams and begin live scoring.</p>
-                </div>
-                <a href="pages/match-setup.html" class="btn btn-primary btn-full">New Match</a>
-            </div>
+        <div class="dashboard-grid">
+            <div class="card glass" style="border-top: 4px solid var(--primary-color);">
+                <h3 style="font-weight: 700; color: var(--primary-color);">Start a Match</h3>
+                <p>Quick start a new match, select teams, and score live.</p>
+                <a href="pages/match-setup.html" class="btn btn-primary"
+                    style="margin-top: 20px; display: inline-block; width: 100%; text-align: center;">New Match</a>
+            </div>
+            <div class="card glass" style="border-top: 4px solid var(--accent-red);">
+                <h3 style="font-weight: 700; color: var(--accent-red);">Manage Teams</h3>
+                <p>Create and manage cricket teams, add players and build rosters.</p>
+                <a href="pages/teams.html" class="btn btn-primary"
+                    style="margin-top: 20px; display: inline-block; width: 100%; text-align: center; background-color: var(--accent-red);">Manage Teams</a>
+            </div>
+            <div class="card glass" style="border-top: 4px solid var(--secondary-color);">
+                <h3 style="font-weight: 700; color: var(--secondary-color);">Host Tournament</h3>
+                <p>Create and structure new multi-team tournaments.</p>
+                <a href="pages/tournaments.html" class="btn btn-primary"
+                    style="margin-top: 20px; display: inline-block; width: 100%; text-align: center; background-color: var(--secondary-color); color: #fff;">Host Tournament</a>
+            </div>
+            <div class="card glass" style="border-top: 4px solid var(--accent-orange);">
+                <h3 style="font-weight: 700; color: var(--accent-orange);">Active Tournaments</h3>
+                <p>Manage matches and standings for ongoing tournaments.</p>
+                <a href="pages/tournaments.html" class="btn btn-primary"
+                    style="margin-top: 20px; display: inline-block; width: 100%; text-align: center; background-color: var(--accent-orange); color: #fff;">View Active</a>
+            </div>
+            <div class="card glass">
+                <h3 style="font-weight: 700; color: var(--primary-color);">Discover</h3>
+                <p>Search for matches and tournaments across the platform.</p>
+                <a href="pages/discover.html" class="btn btn-primary"
+                    style="margin-top: 20px; display: inline-block; width: 100%; text-align: center;">Find Matches</a>
+            </div>
+            
+            <div class="card glass">
+                <h3 style="font-weight: 700; color: var(--primary-color);">Player Stats</h3>
+                <p>View top performers across the platform.</p>
+                <a href="pages/leaderboards.html" class="btn btn-primary"
+                    style="margin-top: 20px; display: inline-block; width: 100%; text-align: center;">Leaderboards</a>
+            </div>
+        </div>
 
-            <div class="card glass action-card" style="border-top: 4px solid #ef4444;">
-                <div>
-                    <h3 style="color: #ef4444;">Manage Teams</h3>
-                    <p>Register new clubs, build player rosters, and edit team details.</p>
-                </div>
-                <a href="pages/teams.html" class="btn btn-primary btn-full" style="background: #ef4444; border: none;">Manage Teams</a>
-            </div>
+        <div style="margin-top: 50px;">
+            <h3 style="margin-bottom: 20px; color: #888;">Recent Matches (Umpired)</h3>
+            <div id="recentMatchesList" class="dashboard-grid">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
 
-            <div class="card glass action-card" style="border-top: 4px solid var(--secondary-color);">
-                <div>
-                    <h3 style="color: var(--secondary-color);">Host Tournament</h3>
-                    <p>Create league brackets, group stages, and official schedules.</p>
-                </div>
-                <a href="pages/tournaments.html" class="btn btn-primary btn-full" style="background: var(--secondary-color); border: none;">Host Tournament</a>
-            </div>
-            
-            <div class="card glass action-card" style="border-top: 4px solid #f59e0b;">
-                <div>
-                    <h3 style="color: #f59e0b;">Ongoing Events</h3>
-                    <p>Access and update standings for your active tournaments.</p>
-                </div>
-                <a href="pages/tournaments.html" class="btn btn-primary btn-full" style="background: #f59e0b; border: none;">View Active</a>
-            </div>
-        </section>
+    <script src="js/api.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
 
-        <section>
-            <div class="section-header">
-                <h3 style="color: #888; margin: 0;">Recent Matches (Umpired)</h3>
-                <a href="pages/discover.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">View All →</a>
-            </div>
-            <div id="recentMatchesList" class="dashboard-grid">
-                <div class="error-placeholder">Loading your recent matches...</div>
-            </div>
-        </section>
-    </main>
+        if (!user || user.role !== 'umpire') {
+            window.location.href = 'pages/login.html';
+        } else {
+            document.getElementById('navUserName').textContent = user.name;
+            if (user.profilePic) {
+                document.getElementById('navProfilePic').src = user.profilePic;
+            } else {
+                document.getElementById('navProfilePic').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`;
+            }
 
-    <script src="js/api.js"></script>
-    <script>
-        const user = JSON.parse(localStorage.getItem('user'));
+            // Show verification banner if not verified
+            if (!user.isVerified) {
+                document.getElementById('verifyBanner').style.display = 'flex';
+            }
 
-        // Safety Guard: Check role and auth
-        if (!user || user.role !== 'umpire') {
-            window.location.href = 'pages/login.html';
-        } else {
-            initUmpireDashboard();
-        }
+            loadRecentMatches();
+        }
 
-        function initUmpireDashboard() {
-            document.getElementById('navUserName').textContent = user.name || 'Official';
-            
-            const profilePic = document.getElementById('navProfilePic');
-            profilePic.src = user.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Umpire')}&background=random`;
+        async function loadRecentMatches() {
+            const list = document.getElementById('recentMatchesList');
+            try {
+                // Fetching all matches for now, as umpires don't have distinct tracking in the backend DB yet.
+                const matches = await fetchAPI('/matches?limit=4');
+                list.innerHTML = '';
 
-            if (!user.isVerified) {
-                document.getElementById('verifyBanner').style.display = 'flex';
-            }
+                if (matches.length === 0) {
+                    list.innerHTML = '<p style="color: #555;">No recent matches found.</p>';
+                    return;
+                }
 
-            loadRecentMatches();
-        }
+                matches.forEach(match => {
+                    const card = document.createElement('div');
+                    card.className = 'card glass';
+                    card.style.borderLeft = match.status === 'Live' ? '4px solid var(--primary-color)' : '1px solid var(--glass-border)';
 
-        async function loadRecentMatches() {
-            const list = document.getElementById('recentMatchesList');
-            try {
-                // In production, update this endpoint to /matches/umpire/${user._id}
-                const matches = await fetchAPI('/matches?limit=4');
-                list.innerHTML = '';
+                    let statusHtml = `<span style="font-size: 0.8em; padding: 2px 6px; border-radius: 4px; background: ${match.status === 'Live' ? '#4ade80' : '#444'}; color: #000;">${match.status}</span>`;
 
-                if (!matches || matches.length === 0) {
-                    list.innerHTML = '<div class="error-placeholder">No recent matches found in your history.</div>';
-                    return;
-                }
+                    const t1Name = match.innings[0] && match.innings[0].battingTeam ? match.innings[0].battingTeam.name : "Team 1";
+                    const t2Name = match.innings[1] && match.innings[1].battingTeam ? match.innings[1].battingTeam.name : "Team 2";
 
-                matches.forEach(match => {
-                    const isLive = match.status === 'Live';
-                    const t1 = match.innings?.[0]?.battingTeam?.name || "Team 1";
-                    const t2 = match.innings?.[1]?.battingTeam?.name || "Team 2";
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <h4 style="margin: 0;">${t1Name} vs ${t2Name}</h4>
+                            ${statusHtml}
+                        </div>
+                        <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">${new Date(match.date).toLocaleDateString()} @ ${match.venue || 'TBD'}</p>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="pages/match-scoring.html?id=${match._id}" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.85em; background-color: var(--secondary-color); color: #fff;">${match.status === 'Completed' ? 'View' : 'Score Match'}</a>
+                            ${match.status === 'Completed' ? `<a href="pages/match-result.html?id=${match._id}" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.85em;">Result</a>` : ''}
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = '<p style="color: var(--error-color);">Error loading matches.</p>';
+            }
+        }
 
-                    const card = document.createElement('div');
-                    card.className = 'card glass';
-                    card.style.borderLeft = isLive ? '4px solid var(--primary-color)' : '1px solid rgba(255,255,255,0.1)';
-
-                    card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <span class="status-tag" style="background: ${isLive ? '#4ade8020' : '#444'}; color: ${isLive ? '#4ade80' : '#ccc'};">
-                                ${match.status}
-                            </span>
-                            <small style="opacity: 0.6;">${new Date(match.date).toLocaleDateString()}</small>
-                        </div>
-                        <h4 style="margin: 0; font-size: 1.1rem;">${t1} vs ${t2}</h4>
-                        <p style="font-size: 0.85rem; color: #888; margin: 8px 0 18px;">📍 ${match.venue || 'Local Ground'}</p>
-                        <div style="display: flex; gap: 10px;">
-                            <a href="pages/match-scoring.html?id=${match._id}" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 0.8rem; background: var(--secondary-color); border: none;">
-                                ${match.status === 'Completed' ? 'View Card' : 'Score Live'}
-                            </a>
-                        </div>
-                    `;
-                    list.appendChild(card);
-                });
-            } catch (err) {
-                console.error('Match Load Error:', err);
-                list.innerHTML = '<div class="error-placeholder" style="color: #ff4d4d;">Failed to load matches. Please refresh.</div>';
-            }
-        }
-    </script>
+        function logout() {
+            clearUser();
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
+
 </html>
