@@ -150,16 +150,7 @@ const getTournamentStandings = async (req, res, next) => {
             throw new Error('Tournament not found');
         }
 
-<<<<<<< HEAD
-        // Fetch only completed matches of this tournament
-        const matches = await Match.find({
-            tournamentId: req.params.id,
-            status: 'Completed'
-        });
-
-=======
         const matches = await Match.find({ tournament: req.params.id, status: 'Completed' });
->>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
         const standings = {};
 
         // Initialize standings for each team
@@ -178,9 +169,6 @@ const getTournamentStandings = async (req, res, next) => {
             };
         }
 
-<<<<<<< HEAD
-        // Process each match to update standings
-=======
         // Helper to count legal balls in an innings
         const getLegalBalls = (inn) => {
             let balls = 0;
@@ -190,7 +178,6 @@ const getTournamentStandings = async (req, res, next) => {
             return balls;
         };
 
->>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
         matches.forEach(match => {
             if (!match.innings || match.innings.length === 0) return;
             const inn1 = match.innings[0];
@@ -204,39 +191,6 @@ const getTournamentStandings = async (req, res, next) => {
             if (standings[team1Id]) standings[team1Id].played += 1;
             if (standings[team2Id]) standings[team2Id].played += 1;
 
-<<<<<<< HEAD
-            // If match has a winner
-            if (match.winner) {
-                const winnerId = match.winner.toString();
-                const loserId = winnerId === team1Id ? team2Id : team1Id;
-
-                if (standings[winnerId]) {
-                    standings[winnerId].won += 1;
-                    standings[winnerId].points += 2; // 2 points for win
-                }
-
-                if (standings[loserId]) {
-                    standings[loserId].lost += 1;
-                }
-
-            // If match is tied
-            } else if (match.result === 'Tie') {
-                if (standings[team1Id]) {
-                    standings[team1Id].tied += 1;
-                    standings[team1Id].points += 1;
-                }
-
-                if (standings[team2Id]) {
-                    standings[team2Id].tied += 1;
-                    standings[team2Id].points += 1;
-                }
-            }
-        });
-
-        // Sort standings → highest points first
-        const sortedStandings = Object.values(standings)
-            .sort((a, b) => b.points - a.points);
-=======
             // Accumulate NRR data: runs scored/conceded, overs faced/bowled
             const balls1 = getLegalBalls(inn1) || (match.totalOvers * 6);
             const balls2 = inn2 ? (getLegalBalls(inn2) || (match.totalOvers * 6)) : (match.totalOvers * 6);
@@ -279,7 +233,6 @@ const getTournamentStandings = async (req, res, next) => {
         const sortedStandings = Object.values(standings).sort((a, b) =>
             b.points !== a.points ? b.points - a.points : b.nrr - a.nrr
         );
->>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
         res.status(200).json(sortedStandings);
     } catch (error) {
@@ -304,16 +257,12 @@ const deleteTournament = async (req, res, next) => {
             res.status(401);
             throw new Error('User not authorized to delete this tournament');
         }
-<<<<<<< HEAD
-=======
-        
         // Prevent deletion if associated matches exist
         const matchCount = await Match.countDocuments({ tournament: tournament._id });
         if (matchCount > 0) {
             res.status(400);
             throw new Error('Cannot delete tournament: Matches are associated with this tournament');
         }
->>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
         // Delete tournament
         await tournament.deleteOne();
