@@ -39,6 +39,15 @@
             z-index: 1;
         }
 
+        /* Light Mode Hero Overrides */
+        html[data-theme="light"] .hero-bg {
+            filter: brightness(0.9);
+        }
+
+        html[data-theme="light"] .hero-overlay {
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(248,250,252,0.95) 100%);
+        }
+
         .hero-content {
             position: relative;
             z-index: 2;
@@ -312,6 +321,70 @@
             font-size: 0.9rem;
         }
 
+        /* Light Mode Specific Adjustments */
+        html[data-theme="light"] .hero-cta .btn-secondary {
+            color: var(--text-primary) !important;
+            border-color: rgba(0,0,0,0.2) !important;
+            background: rgba(0,0,0,0.03) !important;
+        }
+        html[data-theme="light"] .hero-cta .btn-secondary:hover {
+            background: rgba(0,0,0,0.08) !important;
+            color: var(--text-primary) !important;
+        }
+
+        html[data-theme="light"] .feature-card {
+            background: #ffffff;
+            border-color: rgba(0,0,0,0.1);
+        }
+        html[data-theme="light"] .feature-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+            border-color: rgba(0,0,0,0.2);
+        }
+        html[data-theme="light"] .feature-overlay {
+            background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(240,244,248,1) 100%);
+        }
+        html[data-theme="light"] .feature-card:hover .feature-overlay {
+            background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(240,244,248,0.75) 100%);
+        }
+        html[data-theme="light"] .feature-card p {
+            color: var(--text-secondary);
+            text-shadow: none;
+        }
+        html[data-theme="light"] .feature-card h3 {
+            text-shadow: none;
+            color: var(--text-primary);
+        }
+        html[data-theme="light"] .feature-bg {
+            opacity: 0.08;
+        }
+        html[data-theme="light"] .feature-card:hover .feature-bg {
+            opacity: 0.65;
+            filter: grayscale(0) blur(0) brightness(1.05) contrast(1.05) saturate(1.2);
+        }
+        html[data-theme="light"] .hero-stats {
+            background: rgba(255, 255, 255, 0.85);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        html[data-theme="light"] .roles-section {
+            background: rgba(21, 128, 61, 0.05);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        html[data-theme="light"] .role-card.player {
+            background: #ffffff; 
+            border: 1px solid rgba(21, 128, 61, 0.2);
+        }
+        html[data-theme="light"] .role-card.umpire {
+            background: #ffffff; 
+            border: 1px solid rgba(0, 136, 204, 0.2);
+        }
+        html[data-theme="light"] .cta-box {
+            background: linear-gradient(135deg, rgba(21, 128, 61, 0.1), rgba(0, 136, 204, 0.1));
+            border-color: rgba(0,0,0,0.1);
+        }
+
         @media (max-width: 768px) {
             .hero-stats { gap: 30px; flex-wrap: wrap; }
             .roles-grid { grid-template-columns: 1fr; }
@@ -319,6 +392,7 @@
             .cta-box h2 { font-size: 1.8rem; }
         }
     </style>
+    <script src="js/theme.js"></script>
 </head>
 
 <body>
@@ -326,6 +400,7 @@
         <div class="nav-content container">
             <a href="index.html" class="logo">Cric<span>Scores</span></a>
             <div class="nav-links" id="navLinks">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
                 <a href="index.html" class="active">Home</a>
                 <a href="pages/login.html" class="btn btn-secondary" style="border-radius: 20px; padding: 8px 25px;">Login</a>
                 <a href="pages/register.html" class="btn btn-primary" style="border-radius: 20px; padding: 8px 25px;">Sign Up</a>
@@ -416,7 +491,7 @@
                 <div class="feature-card red">
                     <div class="feature-bg" style="background-image: url('images/hero_custom.jpg');"></div>
                     <div class="feature-overlay"></div>
-                    <span class="feature-icon">🔍</span>
+                    <span class="feature-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
                     <h3>Discover Matches</h3>
                     <p>Search for matches and tournaments by location or name. Players can find their next game and umpires can find talent from one dashboard.</p>
                 </div>
@@ -504,6 +579,7 @@
                 : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
 
             navLinks.innerHTML = `
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
                 <a href="${user.role === 'umpire' ? 'umpire-dashboard.html' : 'dashboard.html'}">Dashboard</a>
                 <div class="user-profile" onclick="window.location.href='pages/profile.html'">
                     <img src="${picUrl}" alt="Profile">

@@ -44,6 +44,7 @@
             font-weight: 600;
         }
 
+<<<<<<< HEAD
         @media (max-width: 768px) {
             .profile-container {
                 grid-template-columns: 1fr;
@@ -62,6 +63,28 @@
             </div>
         </div>
     </nav>
+=======
+        @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="../js/theme.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="../index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
+                <a href="../dashboard.html">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
     <div class="container animate-fade" style="margin-top: 40px; position: relative;">
         <a href="../dashboard.html" class="back-btn" title="Back to Dashboard" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
@@ -98,6 +121,7 @@
                     <button id="editProfileBtn" class="btn btn-secondary" style="width:100%; padding:12px; margin-top:10px;">✏️ Edit Details</button>
                 </div>
 
+<<<<<<< HEAD
                 <!-- EDIT MODE (always shown when unverified) -->
                 <form id="profileForm" style="display:none;">
                     <h3 style="margin-bottom: 20px; font-weight: 700;">Edit Details</h3>
@@ -141,6 +165,51 @@
                             </select>
                         </div>
                     </div>
+=======
+                <!-- EDIT MODE (always shown when unverified) -->
+                <form id="profileForm" style="display:none;">
+                    <h3 style="margin-bottom: 20px; font-weight: 700;">Edit Details</h3>
+                    <input type="file" id="picUpload" accept="image/*" style="display: none;">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('picUpload').click();" style="width:100%; padding: 6px 16px; font-size: 0.85em; border-radius: 20px; margin-bottom:15px;">📷 Update Photo</button>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" min="10" max="100">
+                    </div>
+                    
+                    <div id="playerSpecsBlock">
+                        <div class="form-group">
+                            <label for="playerRole">Primary Role</label>
+                            <select id="playerRole" class="form-control">
+                                <option value="Batsman">Batsman</option>
+                                <option value="Bowler">Bowler</option>
+                                <option value="All-rounder">All-rounder</option>
+                                <option value="Wicketkeeper">Wicketkeeper</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="battingStyle">Batting Style</label>
+                            <select id="battingStyle" class="form-control">
+                                <option value="Right-hand bat">Right-hand bat</option>
+                                <option value="Left-hand bat">Left-hand bat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bowlingStyle">Bowling Style</label>
+                            <select id="bowlingStyle" class="form-control">
+                                <option value="None">None</option>
+                                <option value="Right-arm fast">Right-arm fast</option>
+                                <option value="Right-arm medium">Right-arm medium</option>
+                                <option value="Right-arm spin">Right-arm spin</option>
+                                <option value="Left-arm fast">Left-arm fast</option>
+                                <option value="Left-arm spin">Left-arm spin</option>
+                            </select>
+                        </div>
+                    </div>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
                     <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">Save Changes</button>
                     <button type="button" id="verifyProfileBtn" class="btn btn-secondary" style="width: 100%; padding: 15px; margin-top: 10px; border: 2px solid var(--primary-color); display: none;">Verify & Activate Profile</button>

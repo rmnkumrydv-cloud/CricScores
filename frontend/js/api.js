@@ -53,3 +53,10 @@ function clearUser() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
 }
+
+function logout() {
+    clearUser();
+    // Redirect to login, handling both root-level and /pages/ depth
+    const isInPages = window.location.pathname.includes('/pages/');
+    window.location.href = isInPages ? 'login.html' : 'pages/login.html';
+}

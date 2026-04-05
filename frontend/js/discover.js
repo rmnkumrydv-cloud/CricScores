@@ -97,7 +97,7 @@ function renderMatches(matches) {
                         🏆 ${match.winner.name} won
                     </div>
                 ` : ''}
-                <a href="match-details.html?id=${match._id}" class="btn btn-secondary" style="margin-top: 15px; display: block; text-align: center; font-size: 0.85rem;">View Scorecard</a>
+                <a href="live-match.html?id=${match._id}" class="btn btn-secondary" style="margin-top: 15px; display: block; text-align: center; font-size: 0.85rem;">${match.status === 'Live' ? '📺 Watch Live' : 'View Scorecard'}</a>
             </div>
         </div>
     `).join('');

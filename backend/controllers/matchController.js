@@ -44,7 +44,7 @@ const initializeMatch = async (req, res, next) => {
             res.status(403);
             throw new Error('Only umpires can initialize matches');
         }
-        const { team1Id, team2Id, playingXI1, playingXI2, tournamentId, date, venue, totalOvers } = req.body;
+        const { team1Id, team2Id, playingXI1, playingXI2, tournamentId, matchName, date, venue, totalOvers } = req.body;
 
         if (playingXI1.length !== 11 || playingXI2.length !== 11) {
             res.status(400);
@@ -53,6 +53,7 @@ const initializeMatch = async (req, res, next) => {
 
         const match = await Match.create({
             tournament: tournamentId,
+            matchName: matchName || '',
             playingXI1,
             playingXI2,
             date,
@@ -84,6 +85,11 @@ const startMatch = async (req, res, next) => {
         if (!match) {
             res.status(404);
             throw new Error('Match not found');
+        }
+
+        if (match.createdBy.toString() !== req.user.id) {
+            res.status(403);
+            throw new Error('Not authorized to update this match');
         }
 
         match.tossWinner = tossWinner;
@@ -138,6 +144,11 @@ const recordBall = async (req, res, next) => {
         if (!match) {
             res.status(404);
             throw new Error('Match not found');
+        }
+
+        if (match.createdBy.toString() !== req.user.id) {
+            res.status(403);
+            throw new Error('Not authorized to update this match');
         }
 
         const innings = match.innings[inningsIndex];
@@ -321,6 +332,10 @@ const setPlayerOfTheMatch = async (req, res, next) => {
             res.status(404);
             throw new Error('Match not found');
         }
+        if (match.createdBy.toString() !== req.user.id) {
+            res.status(403);
+            throw new Error('Not authorized to update this match');
+        }
         match.playerOfTheMatch = playerId;
         await match.save();
         res.status(200).json(match);
@@ -360,6 +375,10 @@ const updateCurrentPlayers = async (req, res, next) => {
             res.status(404);
             throw new Error('Match not found');
         }
+        if (match.createdBy.toString() !== req.user.id) {
+            res.status(403);
+            throw new Error('Not authorized to update this match');
+        }
         if (strikerId) match.currentStriker = strikerId;
         if (nonStrikerId) match.currentNonStriker = nonStrikerId;
         if (bowlerId) match.currentBowler = bowlerId;
@@ -380,6 +399,11 @@ const undoBall = async (req, res, next) => {
         if (!match) {
             res.status(404);
             throw new Error('Match not found');
+        }
+
+        if (match.createdBy.toString() !== req.user.id) {
+            res.status(403);
+            throw new Error('Not authorized to update this match');
         }
 
         const innings = match.innings[inningsIndex];
@@ -497,6 +521,31 @@ const undoBall = async (req, res, next) => {
     }
 };
 
+// @desc    Delete a match
+// @route   DELETE /api/matches/:id
+// @access  Private
+const deleteMatch = async (req, res, next) => {
+    try {
+        const match = await Match.findById(req.params.id);
+
+        if (!match) {
+            res.status(404);
+            throw new Error('Match not found');
+        }
+
+        if (match.createdBy.toString() !== req.user.id) {
+            res.status(401);
+            throw new Error('User not authorized to delete this match');
+        }
+
+        await match.deleteOne();
+
+        res.status(200).json({ id: req.params.id, message: 'Match deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     initializeMatch,
     getMatchById,
@@ -505,5 +554,6 @@ module.exports = {
     setPlayerOfTheMatch,
     getMatches,
     updateCurrentPlayers,
-    undoBall
+    undoBall,
+    deleteMatch
 };

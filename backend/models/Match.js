@@ -6,6 +6,10 @@ const matchSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Tournament',
         },
+        matchName: {
+            type: String,
+            default: '',
+        },
         playingXI1: [
             {
                 type: mongoose.Schema.Types.ObjectId,

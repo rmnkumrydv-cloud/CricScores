@@ -74,12 +74,14 @@
         .status-scheduled { background: rgba(255, 171, 0, 0.2); color: #ffab00; }
         .status-completed { background: rgba(0, 200, 83, 0.2); color: #00c853; }
     </style>
+    <script src="../js/theme.js"></script>
 </head>
 <body class="dark-mode">
     <nav class="navbar">
         <div class="nav-content container">
             <a href="../dashboard.html" class="logo">Cric<span>Scores</span></a>
             <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
                 <a href="../dashboard.html">Dashboard</a>
                 <a href="leaderboard.html">Leaderboard</a>
                 <div class="user-profile" onclick="window.location.href='profile.html'">
@@ -98,7 +100,9 @@
 
         <div class="search-container">
             <div class="search-input">
-                <i style="font-style: normal; font-size: 1.2rem;">🔍</i>
+                <i style="font-style: normal; display:inline-flex; align-items:center; justify-content:center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </i>
                 <input type="text" id="searchInput" placeholder="Search by venue or tournament name...">
             </div>
         </div>

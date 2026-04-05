@@ -7,12 +7,14 @@
     <title>Tournament Details - CricScores</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="../js/theme.js"></script>
 </head>
 
 <body>
     <nav class="navbar">
         <div class="logo"><a href="../index.html">CricScores</a></div>
         <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
             <a href="tournaments.html">My Tournaments</a>
             <a href="../dashboard.html">Dashboard</a>
             <a href="#" onclick="logout()">Logout</a>
@@ -47,8 +49,7 @@
                 <form id="addTeamForm">
                     <div class="form-group">
                         <label for="teamSelect">Select Team</label>
-                        <select id="teamSelect" required
-                            style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
+                        <select id="teamSelect" required>
                             <option value="">Loading teams...</option>
                         </select>
                     </div>
@@ -82,10 +83,10 @@
         <div id="standingsTab" style="display: none;">
             <h3 style="margin-bottom: 20px;">Points Table</h3>
             <div class="card glass" style="padding: 0; overflow-x: auto; border-radius: 20px;">
-                <table class="scorecard-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <table class="scorecard-table">
                     <thead>
-                        <tr style="background: #333; color: #aaa;">
-                            <th style="padding: 15px;">Team</th>
+                        <tr>
+                            <th>Team</th>
                             <th>P</th>
                             <th>W</th>
                             <th>L</th>

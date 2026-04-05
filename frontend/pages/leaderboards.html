@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<<<<<<< HEAD
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Leaderboards - CricScores</title>
@@ -67,6 +68,59 @@
             </div>
         </div>
     </nav>
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Leaderboards - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .leaderboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .leaderboard-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rank {
+            font-weight: 800;
+            color: var(--primary-color);
+            width: 40px;
+        }
+        .player-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .stat-highlight {
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+    </style>
+    <script src="../js/theme.js"></script>
+</head>
+<body class="dark-mode">
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="../index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
+                <a href="../dashboard.html">Dashboard</a>
+                <a href="leaderboards.html" class="active">Leaderboard</a>
+                <div id="navProfile" class="user-profile" style="display: none;" onclick="window.location.href='profile.html'">
+                    <img id="navProfilePic" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile">
+                    <span id="navUserName">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
     <div class="container animate-fade" style="margin-top: 40px;">
         <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 35px;">
@@ -74,6 +128,7 @@
             <h2 style="font-weight: 800; font-size: 2.2rem; margin: 0; letter-spacing: -1px; color: var(--primary-color);">Global Leaderboards</h2>
         </div>
 
+<<<<<<< HEAD
         <div class="leaderboard-grid">
             <div class="leaderboard-card">
                 <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
@@ -120,6 +175,54 @@
             </div>
         </div>
     </div>
+=======
+        <div class="leaderboard-grid">
+            <div class="leaderboard-card">
+                <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <span style="font-size: 1.5em;">🏏</span> Top Batsmen
+                </h3>
+                <table class="scorecard-table" style="margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Runs</th>
+                            <th>Balls</th>
+                            <th>Avg.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="battingLeaderboard">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #555; padding: 40px;">Loading stats...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="leaderboard-card">
+                <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <span style="font-size: 1.5em;">🎳</span> Top Bowlers
+                </h3>
+                <table class="scorecard-table" style="margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Wkts</th>
+                            <th>Runs</th>
+                            <th>Econ.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bowlingLeaderboard">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #555; padding: 40px;">Loading stats...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
     <script src="../js/api.js"></script>
     <script>
@@ -144,6 +247,7 @@
             }
         }
 
+<<<<<<< HEAD
         function renderBatters(data) {
             const body = document.getElementById('battingLeaderboard');
             body.innerHTML = '';
@@ -185,6 +289,49 @@
                 `;
             });
         }
+=======
+        function renderBatters(data) {
+            const body = document.getElementById('battingLeaderboard');
+            body.innerHTML = '';
+            if (!data || data.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">No data yet</td></tr>';
+                return;
+            }
+            data.forEach((item, index) => {
+                const avg = item.matches && item.matches.length > 0 ? (item.totalRuns / item.matches.length).toFixed(1) : '0.0';
+                body.innerHTML += `
+                    <tr>
+                        <td class="rank">${index + 1}</td>
+                        <td><a href="player-profile.html?id=${item.playerInfo ? item.playerInfo._id : ''}" style="text-decoration: none;"><span class="player-name" style="cursor: pointer;">${item.playerInfo ? item.playerInfo.name : 'Unknown'}</span></a></td>
+                        <td class="stat-highlight">${item.totalRuns}</td>
+                        <td>${item.balls}</td>
+                        <td>${avg}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderBowlers(data) {
+            const body = document.getElementById('bowlingLeaderboard');
+            body.innerHTML = '';
+            if (!data || data.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">No data yet</td></tr>';
+                return;
+            }
+            data.forEach((item, index) => {
+                const econ = item.totalRunsConceded > 0 && item.matches && item.matches.length > 0 ? (item.totalRunsConceded / item.matches.length).toFixed(1) : '0.0';
+                body.innerHTML += `
+                    <tr>
+                        <td class="rank">${index + 1}</td>
+                        <td><a href="player-profile.html?id=${item.playerInfo ? item.playerInfo._id : ''}" style="text-decoration: none;"><span class="player-name" style="cursor: pointer;">${item.playerInfo ? item.playerInfo.name : 'Unknown'}</span></a></td>
+                        <td class="stat-highlight">${item.totalWickets}</td>
+                        <td>${item.totalRunsConceded}</td>
+                        <td>${econ}</td>
+                    </tr>
+                `;
+            });
+        }
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
         loadLeaderboards();
     </script>

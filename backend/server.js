@@ -23,8 +23,14 @@ app.use('/api/tournaments', require('./routes/tournamentRoutes'));
 app.use('/api/matches', require('./routes/matchRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 
-// Serve frontend
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve frontend — disable caching so changes take effect immediately
+app.use(express.static(path.join(__dirname, '../frontend'), {
+    etag: false,
+    lastModified: false,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-store');
+    }
+}));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));

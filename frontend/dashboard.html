@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+<<<<<<< HEAD
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CricScores</title>
@@ -23,6 +24,31 @@
             </div>
         </div>
     </nav>
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CricScores</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="js/theme.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="pages/leaderboards.html">Leaderboard</a>
+                <div class="user-profile" onclick="window.location.href='pages/profile.html'">
+                    <img id="navProfilePic" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile">
+                    <span id="navUserName">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
     <div class="container animate-fade" style="margin-top: 40px;">
         <h2 style="font-weight: 800; font-size: 2.2rem; margin-bottom: 20px; letter-spacing: -1px;">My Dashboard</h2>
@@ -151,6 +177,7 @@
                     const t2Name = (match.innings[1] && match.innings[1].battingTeam && match.innings[1].battingTeam.name) ? match.innings[1].battingTeam.name : 'Team 2';
 
 
+<<<<<<< HEAD
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                             <h4 style="margin: 0;">${t1Name} vs ${t2Name}</h4>
@@ -169,6 +196,26 @@
                 list.innerHTML = '<p style="color: var(--error-color);">Error loading matches.</p>';
             }
         }
+=======
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <h4 style="margin: 0;">${t1Name} vs ${t2Name}</h4>
+                            ${statusHtml}
+                        </div>
+                        <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">${new Date(match.date).toLocaleDateString()} @ ${match.venue || 'TBD'}</p>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="pages/live-match.html?id=${match._id}" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.85em;">${match.status === 'Completed' ? 'View Scorecard' : '📺 Watch Live'}</a>
+                            ${match.status === 'Completed' ? `<a href="pages/match-result.html?id=${match._id}" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.85em;">Result</a>` : ''}
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = '<p style="color: var(--error-color);">Error loading matches.</p>';
+            }
+        }
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
         function logout() {
             clearUser();

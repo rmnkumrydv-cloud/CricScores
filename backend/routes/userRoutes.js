@@ -8,7 +8,8 @@ const {
     getPlayers,
     updateUserProfile,
     getUserStats,
-    getPlayerStats
+    getPlayerStats,
+    getUser
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -20,5 +21,6 @@ router.put('/profile', protect, updateUserProfile);
 router.get('/umpires', getUmpires);
 router.get('/players', getPlayers);
 router.get('/:id/stats', getPlayerStats);
+router.get('/:id', getUser);
 
 module.exports = router;

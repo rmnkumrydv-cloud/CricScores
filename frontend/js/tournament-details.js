@@ -147,26 +147,59 @@ async function loadFixtures() {
     try {
         const matches = await fetchAPI(`/matches?tournamentId=${tournamentId}`);
         fixturesList.innerHTML = '';
+        const loggedInUser = JSON.parse(localStorage.getItem('user'));
 
         if (matches.length === 0) {
-            fixturesList.innerHTML = '<p style="color: var(--text-secondary);">No matches scheduled yet.</p>';
+            fixturesList.innerHTML = `<div class="card glass" style="text-align:center;padding:40px;color:var(--text-secondary);">
+                <div style="font-size:2rem;margin-bottom:12px;">🏏</div>
+                <p style="font-weight:700;margin-bottom:6px;">No matches scheduled yet</p>
+                <p style="font-size:0.85em;">Click "Create Match" to add the first fixture to this tournament.</p>
+            </div>`;
             return;
         }
 
         matches.forEach(match => {
             const date = new Date(match.date).toLocaleString();
+            const team1 = match.innings[0]?.battingTeam?.name || 'Team A';
+            const team2 = match.innings[1]?.battingTeam?.name || 'Team B';
+            const name = match.matchName || `${team1} vs ${team2}`;
+            const statusColors = { Live: '#4ade80', Completed: '#888', Scheduled: '#f59e0b' };
+            const statusBg = { Live: 'rgba(74,222,128,0.15)', Completed: 'rgba(136,136,136,0.15)', Scheduled: 'rgba(245,158,11,0.15)' };
+            const statusBadge = `<span style="font-size:0.75em;padding:3px 10px;border-radius:20px;background:${statusBg[match.status]||'#333'};color:${statusColors[match.status]||'#fff'};font-weight:700;">${match.status}</span>`;
+
+            const isCreator = loggedInUser && (match.createdBy === loggedInUser._id || match.createdBy?._id === loggedInUser._id);
+            let actionBtn = '';
+            if (match.status === 'Completed') {
+                actionBtn = `<a href="match-result.html?id=${match._id}" class="btn btn-secondary" style="padding:8px 16px;font-size:0.85rem;border-radius:10px;">🏆 Result</a>
+                             <a href="live-match.html?id=${match._id}" class="btn btn-secondary" style="padding:8px 16px;font-size:0.85rem;border-radius:10px;">Scorecard</a>`;
+            } else if (isCreator && loggedInUser.role === 'umpire') {
+                actionBtn = `<a href="match-scoring.html?id=${match._id}" class="btn btn-primary" style="padding:8px 16px;font-size:0.85rem;border-radius:10px;">🎙️ Score</a>`;
+            } else {
+                actionBtn = `<a href="live-match.html?id=${match._id}" class="btn btn-primary" style="padding:8px 16px;font-size:0.85rem;border-radius:10px;">📺 Watch Live</a>`;
+            }
+
+            const score1 = match.innings[0] ? `${match.innings[0].runs}/${match.innings[0].wickets}` : '—';
+            const score2 = match.innings[1] ? `${match.innings[1].runs}/${match.innings[1].wickets}` : '—';
+            const showScores = match.status !== 'Scheduled';
+
             const card = document.createElement('div');
             card.className = 'card glass';
-            card.style.marginBottom = '15px';
+            card.style.cssText = 'margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;';
             card.innerHTML = `
-                    <div>
-                        <h4 style="margin-bottom: 5px; font-weight: 700;">${match.innings[0]?.battingTeam?.name || 'Team A'} vs ${match.innings[1]?.battingTeam?.name || 'Team B'}</h4>
-                        <p style="color: var(--text-secondary); font-size: 0.85em;">${date} | ${match.venue}</p>
+                <div style="flex:1;min-width:200px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                        <h4 style="margin:0;font-weight:800;">${name}</h4>
+                        ${statusBadge}
                     </div>
-                    <div>
-                        <a href="match-scoring.html?id=${match._id}" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.85rem; border-radius: 10px;">Score</a>
-                    </div>
+                    <div style="font-size:0.85em;color:var(--text-secondary);">📅 ${date} &nbsp;|&nbsp; 📍 ${match.venue || 'TBD'}</div>
+                    ${showScores ? `<div style="margin-top:8px;font-size:0.9em;font-weight:700;color:var(--text-primary);">
+                        ${team1}: <span style="color:var(--primary-color)">${score1}</span>
+                        &nbsp;vs&nbsp;
+                        ${team2}: <span style="color:var(--secondary-color)">${score2}</span>
+                    </div>` : `<div style="margin-top:6px;font-size:0.85em;color:var(--text-secondary);">${team1} vs ${team2}</div>`}
+                    ${match.winner?.name ? `<div style="margin-top:6px;font-size:0.85em;color:#4ade80;font-weight:700;">🏆 ${match.winner.name} won</div>` : ''}
                 </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">${actionBtn}</div>
             `;
             fixturesList.appendChild(card);
         });

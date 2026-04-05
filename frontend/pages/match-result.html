@@ -86,6 +86,7 @@
             margin-bottom: 10px;
         }
 
+<<<<<<< HEAD
         .btn-home {
             display: inline-block;
             margin-top: 40px;
@@ -121,6 +122,45 @@
             <h4 style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; font-size: 0.9rem;">Match Conclusion</h4>
             <div class="winner-banner" id="winnerName">TEAM A WINS!</div>
             <p id="resultDetail" style="font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 30px;">Won by 4 wickets</p>
+=======
+        .btn-home {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 16px 40px;
+            background: var(--primary-color);
+            color: #000;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+        }
+    </style>
+    <script src="../js/theme.js"></script>
+</head>
+
+<body class="dark-mode">
+    <nav class="navbar">
+        <div class="nav-content container">
+            <a href="../index.html" class="logo">Cric<span>Scores</span></a>
+            <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
+                <a href="../dashboard.html">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container animate-fade" style="margin-top: 40px;">
+        <div class="result-container">
+            <h4 style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; font-size: 0.9rem;">Match Conclusion</h4>
+            <div class="winner-banner" id="winnerName">TEAM A WINS!</div>
+            <p id="resultDetail" style="font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 30px;">Won by 4 wickets</p>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
             <div id="pomSection" class="pom-section">
                 <div style="font-size: 0.8rem; color: #FFD700; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 5px;">🌟 Player of the Match</div>
@@ -181,6 +221,7 @@
                 const scorecardsContainer = document.getElementById('scorecards');
                 scorecardsContainer.innerHTML = '';
 
+<<<<<<< HEAD
                 match.innings.forEach((inn, idx) => {
                     const innDiv = document.createElement('div');
                     innDiv.className = 'innings-section';
@@ -225,6 +266,52 @@
                 console.error(err);
             }
         }
+=======
+                match.innings.forEach((inn, idx) => {
+                    const innDiv = document.createElement('div');
+                    innDiv.className = 'innings-section';
+                    innDiv.style.marginBottom = '40px';
+                    innDiv.innerHTML = `
+                        <h2 style="text-align: left; color: #00E676; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                            ${inn.battingTeam.name} - ${inn.runs}/${inn.wickets} (${inn.overs})
+                        </h2>
+                        <h4 style="text-align: left; color: #aaa; margin: 10px 0;">Batting</h4>
+                        <table class="scorecard-table" style="margin-bottom: 20px;">
+                            <thead>
+                                <tr>
+                                    <th>Batter</th>
+                                    <th>R</th>
+                                    <th>B</th>
+                                    <th>4s</th>
+                                    <th>6s</th>
+                                    <th>SR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batting-${idx}"></tbody>
+                        </table>
+                        <h4 style="text-align: left; color: #aaa; margin: 10px 0;">Bowling</h4>
+                        <table class="scorecard-table">
+                            <thead>
+                                <tr>
+                                    <th>Bowler</th>
+                                    <th>O</th>
+                                    <th>M</th>
+                                    <th>R</th>
+                                    <th>W</th>
+                                    <th>Econ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bowling-${idx}"></tbody>
+                        </table>
+                    `;
+                    scorecardsContainer.appendChild(innDiv);
+                    renderStats(inn, idx);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
         function renderStats(innings, idx) {
             const batBody = document.getElementById(`batting-${idx}`);
@@ -242,6 +329,7 @@
                     else status = `${b.dismissalType} ${fName ? '(' + fName + ')' : ''} b ${bName}`;
                 }
 
+<<<<<<< HEAD
                 batBody.innerHTML += `
                     <tr style="border-bottom: 1px solid #222; text-align: left;">
                         <td style="padding: 10px;">
@@ -256,6 +344,22 @@
                     </tr>
                 `;
             });
+=======
+                batBody.innerHTML += `
+                    <tr>
+                        <td>
+                            <strong>${playerName}</strong><br>
+                            <small style="color: #888;">${status}</small>
+                        </td>
+                        <td>${b.runs}</td>
+                        <td>${b.balls}</td>
+                        <td>${b.fours}</td>
+                        <td>${b.sixes}</td>
+                        <td>${sr}</td>
+                    </tr>
+                `;
+            });
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
             const bowlBody = document.getElementById(`bowling-${idx}`);
             const bowlingStats = innings.bowlingStats || [];
@@ -264,6 +368,7 @@
                 const playerName = bl.player ? bl.player.name : "Unknown Bowler";
                 const econ = bl.overs > 0 ? (bl.runsConceded / (Math.floor(bl.overs) + (bl.overs % 1) * 10 / 6)).toFixed(2) : '0.00';
 
+<<<<<<< HEAD
                 bowlBody.innerHTML += `
                     <tr style="border-bottom: 1px solid #222; text-align: left;">
                         <td style="padding: 10px;">${playerName}</td>
@@ -276,6 +381,20 @@
                 `;
             });
         }
+=======
+                bowlBody.innerHTML += `
+                    <tr>
+                        <td>${playerName}</td>
+                        <td>${bl.overs.toFixed(1)}</td>
+                        <td>${bl.maidens}</td>
+                        <td>${bl.runsConceded}</td>
+                        <td>${bl.wickets}</td>
+                        <td>${econ}</td>
+                    </tr>
+                `;
+            });
+        }
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
         async function openPOMModal() {
             if (!window.currentMatch) return;

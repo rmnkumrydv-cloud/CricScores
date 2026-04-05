@@ -14,6 +14,13 @@ const selectedPlayerName = document.getElementById('selectedPlayerName');
 const selectedPlayerUsername = document.getElementById('selectedPlayerUsername');
 const viewStatsLink = document.getElementById('viewStatsLink');
 
+const editTeamFormContainer = document.getElementById('editTeamFormContainer');
+const editTeamForm = document.getElementById('editTeamForm');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+const editTeamName = document.getElementById('editTeamName');
+const editTeamCity = document.getElementById('editTeamCity');
+const editTeamCaptain = document.getElementById('editTeamCaptain');
+
 let allPlayers = [];
 let selectedPlayerId = null;
 let teamPlayersIds = [];
@@ -134,6 +141,45 @@ addPlayerForm.addEventListener('submit', async (e) => {
     }
 });
 
+cancelEditBtn.addEventListener('click', () => {
+    editTeamFormContainer.style.display = 'none';
+});
+
+editTeamForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = editTeamForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+    try {
+        await fetchAPI(`/teams/${teamId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                name: editTeamName.value,
+                city: editTeamCity.value,
+                captain: editTeamCaptain.value || null
+            })
+        });
+        editTeamFormContainer.style.display = 'none';
+        loadTeamDetails();
+    } catch(err) {
+        alert(err.message);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+    }
+});
+
+async function removePlayer(playerId) {
+    if (confirm('Are you sure you want to remove this player from the team?')) {
+        try {
+            await fetchAPI(`/teams/${teamId}/players/${playerId}`, { method: 'DELETE' });
+            loadTeamDetails();
+        } catch(err) {
+            alert('Failed to remove player: ' + err.message);
+        }
+    }
+}
+
 const deleteTeamBtn = document.getElementById('deleteTeamBtn');
 deleteTeamBtn.addEventListener('click', async () => {
     if (confirm('Are you sure you want to delete this team? All associated players will be permanently removed!')) {
@@ -151,13 +197,28 @@ async function loadTeamDetails() {
         const team = await fetchAPI(`/teams/${teamId}`);
 
         const loggedInUser = JSON.parse(localStorage.getItem('user'));
-        if (team.createdBy === loggedInUser._id) {
+        const isOwner = team.createdBy === loggedInUser._id;
+
+        if (isOwner) {
             deleteTeamBtn.style.display = 'inline-block';
+            editTeamName.value = team.name;
+            editTeamCity.value = team.city || '';
+            editTeamCaptain.innerHTML = '<option value="">No Captain</option>';
+        }
+
+        let editBtnHTML = '';
+        if (isOwner) {
+            editBtnHTML = `<button onclick="document.getElementById('editTeamFormContainer').style.display='block'" class="btn btn-secondary" style="font-size: 0.8rem; padding: 5px 10px; margin-left: 10px;">Edit Info</button>`;
         }
 
         teamHeader.innerHTML = `
-            <h1 style="color: var(--primary-color);">${team.name}</h1>
-            <p style="color: var(--text-secondary); font-size: 1.1em;">${team.city || 'No Location'}</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 style="color: var(--primary-color); display: inline-block;">${team.name}</h1>
+                    ${editBtnHTML}
+                    <p style="color: var(--text-secondary); font-size: 1.1em; margin-top: 5px;">${team.city || 'No Location'}</p>
+                </div>
+            </div>
         `;
 
         playersList.innerHTML = '';
@@ -173,14 +234,31 @@ async function loadTeamDetails() {
                 item.style.justifyContent = 'space-between';
                 item.style.alignItems = 'center';
 
+                if (isOwner) {
+                    const isCaptain = team.captain === player._id;
+                    editTeamCaptain.innerHTML += `<option value="${player._id}" ${isCaptain ? 'selected' : ''}>${player.name}</option>`;
+                }
+
+                const isCaptainLabel = team.captain === player._id ? `<span style="background: var(--primary-color); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; margin-left: 5px; font-weight: bold; vertical-align: middle;">C</span>` : '';
+
+                let removeBtnHTML = '';
+                if (isOwner) {
+                    removeBtnHTML = `<button onclick="removePlayer('${player._id}')" class="btn" style="background: var(--error-color); color: white; padding: 4px 10px; font-size: 0.75rem; border-radius: 6px;">Remove</button>`;
+                }
+
                 item.innerHTML = `
-                    <div>
-                        <h4 style="margin-bottom: 5px; font-weight: 700;">${player.name}</h4>
-                        <span style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">${player.role}</span>
-                    </div>
-                    <div style="text-align: right; font-size: 0.85rem; color: var(--text-secondary);">
-                        <div style="font-weight: 600; color: var(--text-primary);">${player.battingStyle}</div>
-                        <div>${player.bowlingStyle}</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div>
+                            <h4 style="margin-bottom: 5px; font-weight: 700; display: flex; align-items: center;"><a href="player-profile.html?id=${player._id}" style="color: inherit; text-decoration: none; cursor: pointer;">${player.name}</a> ${isCaptainLabel}</h4>
+                            <span style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">${player.role}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="text-align: right; font-size: 0.85rem; color: var(--text-secondary);">
+                                <div style="font-weight: 600; color: var(--text-primary);">${player.battingStyle}</div>
+                                <div>${player.bowlingStyle}</div>
+                            </div>
+                            ${removeBtnHTML}
+                        </div>
                     </div>
                 `;
                 playersList.appendChild(item);

@@ -350,6 +350,22 @@ const getPlayerStats = async (req, res, next) => {
     }
 };
 
+// @desc    Get public user by ID
+// @route   GET /api/users/:id
+// @access  Public
+const getUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password -email');
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        next(error);
+    }
+};
+
 // Generate JWT
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -365,5 +381,6 @@ module.exports = {
     getPlayers,
     updateUserProfile,
     getUserStats,
-    getPlayerStats
+    getPlayerStats,
+    getUser
 };

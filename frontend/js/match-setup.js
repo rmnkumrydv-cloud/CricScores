@@ -267,13 +267,16 @@ function toggleAll(teamNum) {
 async function handleProceed() {
     try {
         const totalOvers = parseInt(document.getElementById('oversInput').value) || 20;
+        const matchName = (document.getElementById('matchNameInput')?.value || '').trim();
+        const venue = (document.getElementById('venueInput')?.value || '').trim() || 'TBD';
         const payload = {
             team1Id: team1Select.value,
             team2Id: team2Select.value,
             tournamentId: tournamentSelect.value || null,
+            matchName,
             playingXI1: selectedPlayers1,
             playingXI2: selectedPlayers2,
-            venue: 'Main Stadium',
+            venue,
             date: new Date(),
             totalOvers
         };

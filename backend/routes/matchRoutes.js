@@ -9,6 +9,7 @@ const {
     setPlayerOfTheMatch,
     updateCurrentPlayers,
     undoBall,
+    deleteMatch
 } = require('../controllers/matchController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -16,7 +17,9 @@ router.route('/')
     .get(getMatches);
 
 router.post('/initialize', protect, restrictTo('umpire'), initializeMatch);
-router.route('/:id').get(getMatchById);
+router.route('/:id')
+    .get(getMatchById)
+    .delete(protect, restrictTo('umpire'), deleteMatch);
 router.put('/:id/start', protect, restrictTo('umpire'), startMatch);
 router.put('/:id/players', protect, restrictTo('umpire'), updateCurrentPlayers);
 router.post('/:id/ball', protect, restrictTo('umpire'), recordBall);

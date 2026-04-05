@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+<<<<<<< HEAD
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Details - CricScores</title>
@@ -19,6 +20,27 @@
             <a href="#" onclick="logout()">Logout</a>
         </div>
     </nav>
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Details - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="../js/theme.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="../index.html">CricScores</a></div>
+        <div class="nav-links">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme" style="background:transparent;border:none;color:var(--text-primary);cursor:pointer;padding:5px;display:flex;align-items:center;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; opacity: 0.8;"></button>
+            <a href="discover.html">Explore</a>
+            <a href="teams.html">My Teams</a>
+            <a href="../dashboard.html">Dashboard</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
     <div class="container animate-fade" style="margin-top: 40px; position: relative;">
         <a href="teams.html" class="back-btn" title="Back to Teams" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
@@ -37,6 +59,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <!-- Add Player Form -->
         <div id="addPlayerFormContainer" class="form-container glass"
             style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px; position: relative; z-index: 100;">
@@ -67,6 +90,65 @@
             <!-- Players loaded here -->
         </div>
     </div>
+=======
+        <!-- Add Player Form -->
+        <div id="addPlayerFormContainer" class="form-container glass"
+            style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px; position: relative; z-index: 100;">
+            <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Add New Player</h3>
+            <form id="addPlayerForm">
+                <div class="form-group">
+                    <label>Search and Select Registered Player</label>
+                    <div style="position: relative;">
+                        <input type="text" id="playerSearch" placeholder="Type name or @username..." class="form-control" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
+                        <div id="searchResults" style="position: absolute; top: 50px; left: 0; right: 0; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; background: #0f172a; border: 1px solid var(--primary-color); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); padding: 5px;"></div>
+                    </div>
+                    <div id="selectedPlayerProfile" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); align-items: center; justify-content: space-between;">
+                        <div>
+                            <span id="selectedPlayerName" style="font-weight: 700; color: var(--primary-color);"></span>
+                            <span id="selectedPlayerUsername" style="color: var(--text-secondary); margin-left: 5px;"></span>
+                        </div>
+                        <a id="viewStatsLink" href="#" target="_blank" class="btn" style="background: rgba(255,255,255,0.05); padding: 8px 15px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; color: white;">👁️ View Stats</a>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Add Player</button>
+                    <button type="button" id="cancelPlayerBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Edit Team Form -->
+        <div id="editTeamFormContainer" class="form-container glass"
+            style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px; position: relative; z-index: 100;">
+            <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Edit Team Info</h3>
+            <form id="editTeamForm">
+                <div class="form-group">
+                    <label for="editTeamName">Team Name</label>
+                    <input type="text" id="editTeamName" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="editTeamCity">City / Location</label>
+                    <input type="text" id="editTeamCity" autocomplete="off">
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="editTeamCaptain">Assign Captain</label>
+                    <select id="editTeamCaptain" class="form-control">
+                        <option value="">No Captain</option>
+                        <!-- Options generated dynamically -->
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="playersList" style="display: grid; gap: 15px;">
+            <!-- Players loaded here -->
+        </div>
+    </div>
+>>>>>>> fce518a (feat: complete light mode integration and UI contrast overhaul)
 
     <script src="../js/api.js"></script>
     <script src="../js/team-details.js"></script>

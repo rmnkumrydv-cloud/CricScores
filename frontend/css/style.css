@@ -223,7 +223,9 @@ ul {
     color: var(--text-secondary);
 }
 
-.form-group input {
+.form-group input,
+.form-group select,
+.form-control {
     width: 100%;
     padding: 10px;
     border-radius: 5px;
@@ -233,7 +235,9 @@ ul {
     outline: none;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-control:focus {
     border-color: var(--primary-color);
 }
 
@@ -345,4 +349,95 @@ ul {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #475569;
+}
+
+/* Tables */
+.scorecard-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.scorecard-table thead tr {
+    background-color: rgba(15, 23, 42, 0.9);
+    color: var(--text-secondary);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.scorecard-table th {
+    padding: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.scorecard-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.scorecard-table tbody tr {
+    transition: var(--transition);
+}
+
+.scorecard-table tbody tr:hover {
+    background-color: rgba(0, 255, 136, 0.03);
+}
+
+.scorecard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Theme Switcher Styles */
+.theme-toggle:hover {
+    background: rgba(125, 125, 125, 0.2) !important;
+    opacity: 1 !important;
+    transform: scale(1.1);
+}
+
+/* Light Mode Overrides */
+html[data-theme="light"] {
+    --primary-color: #15803d; /* Elegant deep green for High Contrast AA legibility */
+    --secondary-color: #0088cc;
+    --accent-red: #d50000;
+    --background-dark: #f8fafc;
+    --background-card: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .navbar {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* Fix button colors inside light mode */
+html[data-theme="light"] .btn-primary {
+    color: #ffffff;
+}
+
+html[data-theme="light"] .btn-primary:hover {
+    background-color: #166534; /* Distinct elite hover green */
+}
+
+/* Fix input borders and select colors inside light mode */
+html[data-theme="light"] .form-group input,
+html[data-theme="light"] .form-group select,
+html[data-theme="light"] .form-control {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+/* Keep scorecard table looking sleek in light mode */
+html[data-theme="light"] .scorecard-table thead tr {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-bottom: 2px solid #cbd5e1;
 }

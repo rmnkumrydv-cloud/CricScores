@@ -52,6 +52,18 @@ async function loadMatch() {
         bowlerId = match.currentBowler?._id || match.currentBowler;
 
         updateUI();
+
+        const loggedInUser = JSON.parse(localStorage.getItem('user'));
+        const createdById = match.createdBy?._id || match.createdBy;
+        const isMatchUmpire = loggedInUser?.role === 'umpire' &&
+            createdById?.toString() === loggedInUser?._id?.toString();
+
+        if (!isMatchUmpire) {
+            // Not this match's umpire — redirect to read-only viewer page
+            window.location.replace(`live-match.html?id=${matchId}`);
+            return;
+        }
+
         checkAndPromptPlayers();
     } catch (error) {
         console.error('Error loading match', error);
@@ -175,6 +187,12 @@ async function rotateStrike() {
 }
 
 function checkAndPromptPlayers() {
+    const loggedInUser = JSON.parse(localStorage.getItem('user'));
+    const createdById = match.createdBy?._id || match.createdBy;
+    const isMatchUmpire = loggedInUser?.role === 'umpire' &&
+        createdById?.toString() === loggedInUser?._id?.toString();
+    if (!isMatchUmpire) return;
+
     if (!strikerId || !nonStrikerId) promptNewInningsPlayers();
     else if (!bowlerId) promptNewBowler();
 }
