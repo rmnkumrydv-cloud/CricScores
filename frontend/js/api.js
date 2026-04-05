@@ -22,6 +22,7 @@ async function fetchAPI(endpoint, options = {}) {
         const response = await fetch(`${API_URL}${endpoint}`, config);
         const data = await response.json();
 
+        
         if (!response.ok) {
             if (response.status === 401) {
                 clearUser();
