@@ -1,161 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Details - CricScores</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        .team-banner {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 30px;
-        }
-
-        .players-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .player-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 15px 20px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: 0.3s ease;
-        }
-
-        .player-card:hover {
-            background: rgba(255,255,255,0.06);
-            transform: translateY(-2px);
-        }
-
-        .search-dropdown {
-            position: absolute;
-            top: 55px;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: #0f172a;
-            border: 1px solid var(--primary-color);
-            border-radius: 12px;
-            max-height: 250px;
-            overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .search-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: 0.2s;
-        }
-
-        .search-item:hover {
-            background: var(--primary-color);
-            color: #000;
-        }
-
-        .remove-btn {
-            color: #ff4d4d;
-            background: rgba(255, 77, 77, 0.1);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Details - CricScores</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="dark-mode">
-    <nav class="navbar">
-        <div class="nav-content container">
-            <a href="../index.html" class="logo">Cric<span>Scores</span></a>
-            <div class="nav-links">
-                <a href="discover.html">Explore</a>
-                <a href="teams.html" class="active">My Teams</a>
-                <a href="../dashboard.html">Dashboard</a>
-                <button onclick="logout()" class="btn-sm btn-secondary">Logout</button>
-            </div>
-        </div>
-    </nav>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="../index.html">CricScores</a></div>
+        <div class="nav-links">
+            <a href="discover.html">Explore</a>
+            <a href="teams.html">My Teams</a>
+            <a href="../dashboard.html">Dashboard</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
 
-    <main class="container animate-fade" style="margin-top: 40px;">
-        <header style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px;">
-            <a href="teams.html" class="btn-icon" aria-label="Back to Teams">←</a>
-            <h1 style="font-weight: 800; font-size: 2.2rem; margin: 0; letter-spacing: -1.5px;">Team <span style="color:var(--primary-color)">Details</span></h1>
-        </header>
+    <div class="container animate-fade" style="margin-top: 40px; position: relative;">
+        <a href="teams.html" class="back-btn" title="Back to Teams" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
+        <div id="teamHeader" class="glass" style="margin-bottom: 30px; padding: 30px; border-radius: 20px;">
+            <!-- Team info loaded here -->
+            <p>Loading...</p>
+        </div>
 
-        <section id="teamHeader" class="team-banner">
-            <div class="loading-spinner"></div>
-            <p style="text-align: center; color: var(--text-secondary);">Fetching team data...</p>
-        </section>
+        <div class="team-section" style="position: relative; z-index: 10;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Players</h3>
+                <div>
+                    <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
+                    <button id="deleteTeamBtn" class="btn" style="background: var(--error-color); color: white; display: none;">Delete Team</button>
+                </div>
+            </div>
+        </div>
 
-        <section class="team-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 1.5rem; margin: 0;">Squad Roster</h3>
-                <div style="display: flex; gap: 10px;">
-                    <button id="addPlayerBtn" class="btn btn-primary">Add Player</button>
-                    <button id="deleteTeamBtn" class="btn" style="background: rgba(255, 77, 77, 0.2); color: #ff4d4d; display: none; border: 1px solid rgba(255, 77, 77, 0.3);">Delete Team</button>
-                </div>
-            </div>
+        <!-- Add Player Form -->
+        <div id="addPlayerFormContainer" class="form-container glass"
+            style="display: none; margin: 0 auto 40px auto; max-width: 600px; border-radius: 20px; position: relative; z-index: 100;">
+            <h3 style="margin-bottom: 20px; color: var(--primary-color); font-weight: 700;">Add New Player</h3>
+            <form id="addPlayerForm">
+                <div class="form-group">
+                    <label>Search and Select Registered Player</label>
+                    <div style="position: relative;">
+                        <input type="text" id="playerSearch" placeholder="🔍 Type name or @username..." class="form-control" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
+                        <div id="searchResults" style="position: absolute; top: 50px; left: 0; right: 0; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; background: #0f172a; border: 1px solid var(--primary-color); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); padding: 5px;"></div>
+                    </div>
+                    <div id="selectedPlayerProfile" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); align-items: center; justify-content: space-between;">
+                        <div>
+                            <span id="selectedPlayerName" style="font-weight: 700; color: var(--primary-color);"></span>
+                            <span id="selectedPlayerUsername" style="color: var(--text-secondary); margin-left: 5px;"></span>
+                        </div>
+                        <a id="viewStatsLink" href="#" target="_blank" class="btn" style="background: rgba(255,255,255,0.05); padding: 8px 15px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; color: white;">👁️ View Stats</a>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Add Player</button>
+                    <button type="button" id="cancelPlayerBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
 
-            <div id="addPlayerFormContainer" class="form-container glass" style="display: none; max-width: 600px; margin: 20px auto 40px; border-radius: 20px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Invite Registered Player</h3>
-                <form id="addPlayerForm">
-                    <div class="form-group" style="position: relative; margin-bottom: 20px;">
-                        <label>Search Player Database</label>
-                        <input type="text" id="playerSearch" placeholder="Type name or @username..." class="form-control" autocomplete="off">
-                        <div id="searchResults" class="search-dropdown" style="display: none;"></div>
-                        
-                        <div id="selectedPlayerProfile" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); align-items: center; justify-content: space-between;">
-                            <div>
-                                <span id="selectedPlayerName" style="font-weight: 700; color: var(--primary-color);"></span>
-                                <span id="selectedPlayerUsername" style="color: var(--text-secondary); margin-left: 5px; font-size: 0.9rem;"></span>
-                            </div>
-                            <a id="viewStatsLink" href="#" target="_blank" class="btn-sm btn-secondary" style="text-decoration: none;">View Stats</a>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button type="submit" class="btn btn-primary" style="flex: 2;">Add to Squad</button>
-                        <button type="button" id="cancelPlayerBtn" class="btn btn-secondary" style="flex: 1;">Cancel</button>
-                    </div>
-                </form>
-            </div>
+        <div id="playersList" style="display: grid; gap: 15px;">
+            <!-- Players loaded here -->
+        </div>
+    </div>
 
-            <div id="playersList" class="players-grid">
-                </div>
-        </section>
-    </main>
+    <script src="../js/api.js"></script>
+    <script src="../js/team-details.js"></script>
+    <script>
+        // Check if user is logged in
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = 'login.html';
+        }
 
-    <script src="../js/api.js"></script>
-    <script src="../js/team-details.js"></script>
-    <script>
-        const currentUser = JSON.parse(localStorage.getItem('user'));
-        if (!currentUser) window.location.href = 'login.html';
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = '../index.html';
-        }
-
-        // Logic for "Select" UI in search
-        document.getElementById('playerSearch').addEventListener('focus', () => {
-            const results = document.getElementById('searchResults');
-            if(results.innerHTML.trim() !== "") results.style.display = 'block';
-        });
-    </script>
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '../index.html';
+        }
+    </script>
 </body>
+
 </html>
