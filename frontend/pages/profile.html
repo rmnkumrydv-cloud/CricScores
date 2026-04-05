@@ -1,121 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - CricScores</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         .profile-container {
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 30px;
+            grid-template-columns: minmax(300px, 1fr) 2fr;
+            gap: 25px;
             margin-top: 20px;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
         }
 
         .stat-card {
-            background: #252525;
+            background: rgba(255, 255, 255, 0.03);
             padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #333;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: var(--primary-color);
-            margin: 10px 0;
+            margin: 5px 0;
+            font-variant-numeric: tabular-nums;
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
         }
 
-        @media (max-width: 768px) {
+        .profile-field-label {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 992px) {
             .profile-container {
                 grid-template-columns: 1fr;
             }
         }
+        
+        .loading-shimmer {
+            background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
 
-<body>
+<body class="dark-mode">
     <nav class="navbar">
         <div class="nav-content container">
             <a href="../index.html" class="logo">Cric<span>Scores</span></a>
             <div class="nav-links">
                 <a href="../dashboard.html">Dashboard</a>
-                <a href="#" onclick="logout()">Logout</a>
+                <button onclick="logout()" class="btn-sm btn-secondary">Logout</button>
             </div>
         </div>
     </nav>
 
-    <div class="container animate-fade" style="margin-top: 40px; position: relative;">
-        <a href="../dashboard.html" class="back-btn" title="Back to Dashboard" style="position: absolute; left: -50px; top: 0;">&#8592;</a>
-        
-        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 style="font-weight: 800; font-size: 2.2rem; letter-spacing: -1px; color: var(--primary-color);">My Profile</h2>
-                <p style="color: var(--text-secondary);">Manage your player details and view your lifetime statistics.</p>
+    <main class="container animate-fade" style="margin-top: 40px;">
+        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <a href="../dashboard.html" class="btn-icon" aria-label="Back to Dashboard">←</a>
+                <div>
+                    <h1 style="font-weight: 800; font-size: 2.2rem; letter-spacing: -1.5px; margin: 0;">My <span style="color: var(--primary-color);">Profile</span></h1>
+                    <p style="color: var(--text-secondary); margin: 5px 0 0;">Manage your official identity and career stats.</p>
+                </div>
             </div>
-            <div id="verifiedBadge" class="glass" style="padding: 10px 20px; border-radius: 30px; border: 1px solid #444; display: none; align-items: center; gap: 10px;">
-                <span id="verifyStatusDot" style="width: 12px; height: 12px; border-radius: 50%; background: #ff4d4d;"></span>
-                <span id="verifyText" style="font-weight: 700; font-size: 0.9em; text-transform: uppercase;">Incomplete Profile</span>
+            
+            <div id="verifiedBadge" class="glass" style="padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); display: none; align-items: center; gap: 10px;">
+                <span id="verifyStatusDot" style="width: 10px; height: 10px; border-radius: 50%; background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d55;"></span>
+                <span id="verifyText" style="font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Verification Required</span>
             </div>
-        </div>
+        </header>
 
         <div class="profile-container">
-            <!-- Left Side: Edit Form -->
-            <div class="card glass">
-                <!-- Avatar always visible -->
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img id="avatarPreview" src="https://ui-avatars.com/api/?name=User&background=random" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid var(--primary-color);">
-                </div>
-
-                <!-- VIEW MODE (shown when verified) -->
-                <div id="profileViewMode" style="display:none;">
-                    <h3 style="margin-bottom: 20px; font-weight: 700;">My Details</h3>
-                    <div style="margin-bottom: 12px;"><span style="color:var(--text-secondary); font-size:0.85em; text-transform:uppercase;">Full Name</span><p style="font-weight:700; margin-top:4px;" id="viewName">—</p></div>
-                    <div style="margin-bottom: 12px;"><span style="color:var(--text-secondary); font-size:0.85em; text-transform:uppercase;">Age</span><p style="font-weight:700; margin-top:4px;" id="viewAge">—</p></div>
-                    <div id="playerViewSpecs">
-                        <div style="margin-bottom: 12px;"><span style="color:var(--text-secondary); font-size:0.85em; text-transform:uppercase;">Primary Role</span><p style="font-weight:700; margin-top:4px;" id="viewRole">—</p></div>
-                        <div style="margin-bottom: 12px;"><span style="color:var(--text-secondary); font-size:0.85em; text-transform:uppercase;">Batting Style</span><p style="font-weight:700; margin-top:4px;" id="viewBatting">—</p></div>
-                        <div style="margin-bottom: 12px;"><span style="color:var(--text-secondary); font-size:0.85em; text-transform:uppercase;">Bowling Style</span><p style="font-weight:700; margin-top:4px;" id="viewBowling">—</p></div>
+            <section class="card glass">
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="position: relative; display: inline-block;">
+                        <img id="avatarPreview" src="https://ui-avatars.com/api/?name=User&background=random" 
+                             style="width: 120px; height: 120px; border-radius: 24px; object-fit: cover; border: 3px solid var(--primary-color); background: #1a1a1a;">
                     </div>
-                    <button id="editProfileBtn" class="btn btn-secondary" style="width:100%; padding:12px; margin-top:10px;">✏️ Edit Details</button>
                 </div>
 
-                <!-- EDIT MODE (always shown when unverified) -->
+                <div id="profileViewMode" style="display:none;">
+                    <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Personal Details</h2>
+                    <div style="margin-bottom: 15px;">
+                        <span class="profile-field-label">Full Name</span>
+                        <p style="font-weight:700; font-size: 1.1rem;" id="viewName">—</p>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <span class="profile-field-label">Age</span>
+                        <p style="font-weight:700;" id="viewAge">—</p>
+                    </div>
+                    
+                    <div id="playerViewSpecs">
+                        <div style="margin-bottom: 15px;">
+                            <span class="profile-field-label">Primary Role</span>
+                            <p style="font-weight:700; color: var(--primary-color);" id="viewRole">—</p>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <span class="profile-field-label">Batting</span>
+                                <p style="font-weight:600; font-size: 0.9rem;" id="viewBatting">—</p>
+                            </div>
+                            <div>
+                                <span class="profile-field-label">Bowling</span>
+                                <p style="font-weight:600; font-size: 0.9rem;" id="viewBowling">—</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="editProfileBtn" class="btn btn-secondary" style="width:100%; margin-top:20px;">✏️ Edit Profile</button>
+                </div>
+
                 <form id="profileForm" style="display:none;">
-                    <h3 style="margin-bottom: 20px; font-weight: 700;">Edit Details</h3>
+                    <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Update Details</h2>
                     <input type="file" id="picUpload" accept="image/*" style="display: none;">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('picUpload').click();" style="width:100%; padding: 6px 16px; font-size: 0.85em; border-radius: 20px; margin-bottom:15px;">📷 Update Photo</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('picUpload').click();" style="width:100%; margin-bottom:20px;">📷 Change Photo</button>
+                    
                     <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" required>
+                        <label for="name">Display Name</label>
+                        <input type="text" id="name" required placeholder="Enter full name">
                     </div>
                     <div class="form-group">
                         <label for="age">Age</label>
-                        <input type="number" id="age" min="10" max="100">
+                        <input type="number" id="age" min="10" max="99">
                     </div>
                     
                     <div id="playerSpecsBlock">
                         <div class="form-group">
-                            <label for="playerRole">Primary Role</label>
-                            <select id="playerRole" class="form-control" style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
+                            <label>Primary Role</label>
+                            <select id="playerRole" class="form-control">
                                 <option value="Batsman">Batsman</option>
                                 <option value="Bowler">Bowler</option>
                                 <option value="All-rounder">All-rounder</option>
@@ -123,18 +172,17 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="battingStyle">Batting Style</label>
-                            <select id="battingStyle" class="form-control" style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
+                            <label>Batting Style</label>
+                            <select id="battingStyle" class="form-control">
                                 <option value="Right-hand bat">Right-hand bat</option>
                                 <option value="Left-hand bat">Left-hand bat</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="bowlingStyle">Bowling Style</label>
-                            <select id="bowlingStyle" class="form-control" style="width: 100%; padding: 10px; background: #2C2C2C; color: white; border: 1px solid #333; border-radius: 5px;">
-                                <option value="None">None</option>
+                            <label>Bowling Style</label>
+                            <select id="bowlingStyle" class="form-control">
+                                <option value="None">None / Part-time</option>
                                 <option value="Right-arm fast">Right-arm fast</option>
-                                <option value="Right-arm medium">Right-arm medium</option>
                                 <option value="Right-arm spin">Right-arm spin</option>
                                 <option value="Left-arm fast">Left-arm fast</option>
                                 <option value="Left-arm spin">Left-arm spin</option>
@@ -142,81 +190,64 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">Save Changes</button>
-                    <button type="button" id="verifyProfileBtn" class="btn btn-secondary" style="width: 100%; padding: 15px; margin-top: 10px; border: 2px solid var(--primary-color); display: none;">Verify & Activate Profile</button>
-                    <div id="updateMsg" style="margin-top: 15px; text-align: center; display: none;"></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
+                    <button type="button" id="cancelEdit" class="btn btn-text" style="width: 100%; margin-top: 10px;">Cancel</button>
+                    <div id="updateMsg" style="margin-top: 15px; text-align: center; font-size: 0.85rem;"></div>
                 </form>
-            </div>
+            </section>
 
-            <!-- Right Side: Lifetime Stats -->
-            <div class="card glass">
-                <h3 style="margin-bottom: 20px; font-weight: 700;">Career Statistics</h3>
-                <div id="statsLoader" style="color: #aaa; text-align: center; padding: 30px;">Calculating stats...</div>
+            <section class="card glass">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 style="font-size: 1.3rem; margin: 0;">Career Analytics</h2>
+                    <span id="roleBadge" class="badge" style="background: var(--primary-color); color: #000;">Player</span>
+                </div>
+                
+                <div id="statsLoader" class="loading-shimmer" style="height: 200px; width: 100%;"></div>
                 
                 <div id="statsContainer" style="display: none;">
-                    <!-- Player Stats (Existing) -->
                     <div id="playerStatsSection">
-                        <div class="stat-card" style="margin-bottom: 15px; grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;">
-                            <span class="stat-label">Matches Played</span>
-                            <span class="stat-value" id="statMatches" style="margin: 0; font-size: 2.5rem;">0</span>
+                        <div class="stat-card" style="margin-bottom: 20px; border-left: 4px solid var(--primary-color);">
+                            <span class="stat-label">Lifetime Matches</span>
+                            <div class="stat-value" id="statMatches" style="font-size: 3rem;">0</div>
                         </div>
 
-                        <h4 style="color: #888; margin: 20px 0 10px 0; font-size: 0.9em; text-transform: uppercase;">Batting</h4>
-                        <div class="stats-grid" style="margin-bottom: 20px;">
-                            <div class="stat-card">
-                                <div class="stat-label">Total Runs</div>
-                                <div class="stat-value" id="statRuns">0</div>
+                        <div style="display: grid; gap: 25px;">
+                            <div>
+                                <h3 style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px;">Batting Record</h3>
+                                <div class="stats-grid">
+                                    <div class="stat-card"><div class="stat-label">Runs</div><div class="stat-value" id="statRuns">0</div></div>
+                                    <div class="stat-card"><div class="stat-label">Strike Rate</div><div class="stat-value" id="statSR">0.0</div></div>
+                                    <div class="stat-card"><div class="stat-label">4s / 6s</div><div class="stat-value" style="color: #fff;"><span id="statFours">0</span> <small style="color: #444;">/</small> <span id="statSixes">0</span></div></div>
+                                </div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Strike Rate</div>
-                                <div class="stat-value" id="statSR">0.0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Fours</div>
-                                <div class="stat-value" id="statFours" style="color: #fff;">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Sixes</div>
-                                <div class="stat-value" id="statSixes" style="color: #fff;">0</div>
-                            </div>
-                        </div>
 
-                        <h4 style="color: #888; margin: 20px 0 10px 0; font-size: 0.9em; text-transform: uppercase;">Bowling</h4>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-label">Wickets</div>
-                                <div class="stat-value" id="statWickets">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Economy</div>
-                                <div class="stat-value" id="statEcon">0.0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Overs</div>
-                                <div class="stat-value" id="statOvers" style="color: #fff;">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Runs Allowed</div>
-                                <div class="stat-value" id="statRunsConceded" style="color: #fff;">0</div>
+                            <div>
+                                <h3 style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px;">Bowling Record</h3>
+                                <div class="stats-grid">
+                                    <div class="stat-card"><div class="stat-label">Wickets</div><div class="stat-value" id="statWickets">0</div></div>
+                                    <div class="stat-card"><div class="stat-label">Economy</div><div class="stat-value" id="statEcon">0.0</div></div>
+                                    <div class="stat-card"><div class="stat-label">Overs</div><div class="stat-value" id="statOvers" style="color: #fff;">0</div></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Umpire Stats -->
                     <div id="umpireStatsSection" style="display: none;">
-                        <div class="stat-card" style="margin-bottom: 25px;">
-                            <div class="stat-label">Matches Umpired</div>
-                            <div class="stat-value" id="statMatchesUmpired" style="font-size: 4rem;">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Tournaments Managed</div>
-                            <div class="stat-value" id="statTournamentsManaged" style="font-size: 4rem;">0</div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Umpired Matches</div>
+                                <div class="stat-value" id="statMatchesUmpired" style="font-size: 3.5rem;">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Managed Tournaments</div>
+                                <div class="stat-value" id="statTournamentsManaged" style="font-size: 3.5rem;">0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
-    </div>
+    </main>
 
     <script src="../js/api.js"></script>
     <script src="../js/profile.js"></script>
@@ -225,7 +256,12 @@
             clearUser();
             window.location.href = '../index.html';
         }
+        
+        // Simple UI toggle for edit/view if not handled by profile.js
+        document.getElementById('cancelEdit')?.addEventListener('click', () => {
+            document.getElementById('profileForm').style.display = 'none';
+            document.getElementById('profileViewMode').style.display = 'block';
+        });
     </script>
 </body>
-
 </html>
