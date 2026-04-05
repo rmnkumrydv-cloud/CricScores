@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../login.html';
         return;
     }
+    
 
     document.getElementById('navUserName').textContent = user.name;
     if (user.profilePic) {
