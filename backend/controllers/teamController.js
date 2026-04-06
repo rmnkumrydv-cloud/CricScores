@@ -2,40 +2,45 @@ const Team = require('../models/Team');
 const Player = require('../models/Player');
 const User = require('../models/User');
 
-// @desc    Get all teams
-// @route   GET /api/teams
-// @access  Public
+/**
+ * @desc    Get all teams
+ * @route   GET /api/teams
+ * @access  Public
+ */
 const getTeams = async (req, res, next) => {
     try {
-        const teams = await Team.find();
+        const teams = await Team.find().lean(); // lean() → faster read
         res.status(200).json(teams);
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Get my teams
-// @route   GET /api/teams/my
-// @access  Private
+/**
+ * @desc    Get teams created by logged-in user
+ * @route   GET /api/teams/my
+ * @access  Private
+ */
 const getMyTeams = async (req, res, next) => {
     try {
-        const teams = await Team.find({ createdBy: req.user.id });
+        const teams = await Team.find({ createdBy: req.user.id }).lean();
         res.status(200).json(teams);
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Create a team
-// @route   POST /api/teams
-// @access  Private
+/**
+ * @desc    Create a new team
+ * @route   POST /api/teams
+ * @access  Private
+ */
 const createTeam = async (req, res, next) => {
     try {
         const { name, city } = req.body;
 
         if (!name) {
-            res.status(400);
-            throw new Error('Please add a team name');
+            return res.status(400).json({ message: 'Team name is required' });
         }
 
         const team = await Team.create({
@@ -45,40 +50,48 @@ const createTeam = async (req, res, next) => {
         });
 
         res.status(201).json(team);
+
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Add player to team
-// @route   POST /api/teams/:id/players
-// @access  Private
+/**
+ * @desc    Add a player to a team
+ * @route   POST /api/teams/:id/players
+ * @access  Private
+ */
 const addPlayerToTeam = async (req, res, next) => {
     try {
         const { userId } = req.body;
+
         const team = await Team.findById(req.params.id);
+        if (!team) throw new Error('Team not found');
 
-        if (!team) {
-            res.status(404);
-            throw new Error('Team not found');
-        }
-
+        // Authorization check
         if (team.createdBy.toString() !== req.user.id) {
-            res.status(401);
-            throw new Error('User not authorized');
+            return res.status(401).json({ message: 'Not authorized' });
         }
 
+        // Validate user
         const user = await User.findById(userId);
         if (!user || user.role !== 'player') {
-            res.status(400);
-            throw new Error('Invalid user selected or user is not registered as a player');
+            return res.status(400).json({ message: 'Invalid player user' });
         }
 
         if (!user.isVerified) {
-            res.status(400);
-            throw new Error('This player has not verified their profile. They must provide all details in their profile page first.');
+            return res.status(400).json({
+                message: 'Player profile not verified'
+            });
         }
 
+        // Prevent duplicate players
+        const existingPlayer = await Player.findOne({ userRef: user._id, team: team._id });
+        if (existingPlayer) {
+            return res.status(400).json({ message: 'Player already exists in this team' });
+        }
+
+        // Create player entry
         const player = await Player.create({
             name: user.name,
             role: user.playerRole || 'All-rounder',
@@ -93,139 +106,134 @@ const addPlayerToTeam = async (req, res, next) => {
         await team.save();
 
         res.status(201).json(player);
+
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Get team details with players
-// @route   GET /api/teams/:id
-// @access  Public
+
+/**
+ * @desc    Get team details with players
+ */
 const getTeamById = async (req, res, next) => {
     try {
         const team = await Team.findById(req.params.id).populate('players');
-        if (!team) {
-            res.status(404);
-            throw new Error('Team not found');
-        }
+        if (!team) throw new Error('Team not found');
+
         res.status(200).json(team);
+
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Get players of a specific team
-// @route   GET /api/teams/:id/players
-// @access  Public
+
+/**
+ * @desc    Get all players of a team
+ */
 const getTeamPlayers = async (req, res, next) => {
     try {
         const team = await Team.findById(req.params.id).populate('players');
-        if (!team) {
-            res.status(404);
-            throw new Error('Team not found');
-        }
+        if (!team) throw new Error('Team not found');
+
         res.status(200).json(team.players);
+
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Update team details
-// @route   PUT /api/teams/:id
-// @access  Private
+
+/**
+ * @desc    Update team details (name, city, captain)
+ */
 const updateTeam = async (req, res, next) => {
     try {
         const team = await Team.findById(req.params.id);
-
-        if (!team) {
-            res.status(404);
-            throw new Error('Team not found');
-        }
+        if (!team) throw new Error('Team not found');
 
         if (team.createdBy.toString() !== req.user.id) {
-            res.status(401);
-            throw new Error('User not authorized');
+            return res.status(401).json({ message: 'Not authorized' });
         }
 
-        const captainId = req.body.captain;
-        if (captainId && !team.players.includes(captainId)) {
-            res.status(400);
-            throw new Error('Captain must be a player in this team');
+        const { name, city, captain } = req.body;
+
+        // Ensure captain belongs to team
+        if (captain && !team.players.includes(captain)) {
+            return res.status(400).json({
+                message: 'Captain must be from the team players'
+            });
         }
 
         const updatedTeam = await Team.findByIdAndUpdate(
             req.params.id,
-            {
-                name: req.body.name,
-                city: req.body.city,
-                captain: captainId || null
-            },
+            { name, city, captain: captain || null },
             { new: true }
         );
 
         res.status(200).json(updatedTeam);
+
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Remove player from team
-// @route   DELETE /api/teams/:id/players/:playerId
-// @access  Private
+
+/**
+ * @desc    Remove player from team
+ */
 const removePlayerFromTeam = async (req, res, next) => {
     try {
-        const team = await Team.findById(req.params.id);
+        const { id, playerId } = req.params;
 
-        if (!team) {
-            res.status(404);
-            throw new Error('Team not found');
-        }
+        const team = await Team.findById(id);
+        if (!team) throw new Error('Team not found');
 
         if (team.createdBy.toString() !== req.user.id) {
-            res.status(401);
-            throw new Error('User not authorized');
+            return res.status(401).json({ message: 'Not authorized' });
         }
 
-        const playerIndex = team.players.indexOf(req.params.playerId);
-        if (playerIndex === -1) {
-            res.status(404);
-            throw new Error('Player not found in this team');
+        const index = team.players.indexOf(playerId);
+        if (index === -1) {
+            return res.status(404).json({ message: 'Player not in team' });
         }
 
-        team.players.splice(playerIndex, 1);
-        
-        if (team.captain && team.captain.toString() === req.params.playerId) {
+        // Remove player
+        team.players.splice(index, 1);
+
+        // Remove captain if needed
+        if (team.captain?.toString() === playerId) {
             team.captain = null;
         }
 
         await team.save();
-        await Player.findByIdAndDelete(req.params.playerId);
+        await Player.findByIdAndDelete(playerId);
 
-        res.status(200).json({ id: req.params.playerId, message: 'Player removed from team' });
+        res.status(200).json({
+            id: playerId,
+            message: 'Player removed successfully'
+        });
+
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Delete a team
-// @route   DELETE /api/teams/:id
-// @access  Private
+
+/**
+ * @desc    Delete a team
+ */
 const deleteTeam = async (req, res, next) => {
     try {
         const team = await Team.findById(req.params.id);
+        if (!team) throw new Error('Team not found');
 
-        if (!team) {
-            res.status(404);
-            throw new Error('Team not found');
-        }
-
-        // Check for user
         if (team.createdBy.toString() !== req.user.id) {
-            res.status(401);
-            throw new Error('User not authorized to delete this team');
+            return res.status(401).json({ message: 'Not authorized' });
         }
 
-        // Prevent deletion if team is part of a match
+        // Prevent deletion if team is used in matches
         const Match = require('../models/Match');
         const matchCount = await Match.countDocuments({
             $or: [
@@ -235,17 +243,21 @@ const deleteTeam = async (req, res, next) => {
         });
 
         if (matchCount > 0) {
-            res.status(400);
-            throw new Error('Cannot delete team: This team is associated with existing historic matches');
+            return res.status(400).json({
+                message: 'Team is used in matches and cannot be deleted'
+            });
         }
 
-        // Delete associated players first
+        // Delete related players first
         await Player.deleteMany({ team: team._id });
-        
-        // Delete team
+
         await team.deleteOne();
 
-        res.status(200).json({ id: req.params.id, message: 'Team and associated players deleted' });
+        res.status(200).json({
+            id: req.params.id,
+            message: 'Team deleted successfully'
+        });
+
     } catch (error) {
         next(error);
     }
