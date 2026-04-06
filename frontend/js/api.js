@@ -1,4 +1,7 @@
-const API_URL = 'http://localhost:5000/api';
+// Determine if the frontend is running locally or deployed
+// If you host the frontend on GitHub Pages and backend on Render, change the `/api` string below to your Render URL (like 'https://your-ren-app.onrender.com/api')
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+const API_URL = isLocal ? 'http://localhost:5000/api' : '/api';
 
 async function fetchAPI(endpoint, options = {}) {
     const user = JSON.parse(localStorage.getItem('user'));
